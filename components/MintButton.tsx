@@ -13,7 +13,7 @@ interface MintButtonProps {
 
 export function MintButton({ analogy, onSuccess, onConnect }: MintButtonProps) {
   const { isConnected } = useAccount();
-  const { priceInWei, priceInETH, isLoading: priceLoading } = useMintPrice();
+  const { priceInWei } = useMintPrice();
 
   const {
     writeContract,

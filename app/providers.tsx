@@ -5,7 +5,6 @@ import { OnchainKitProvider } from "@coinbase/onchainkit";
 import { ThemeProvider } from "@coinbase/cds-web";
 import { MediaQueryProvider } from "@coinbase/cds-web/system";
 import { onebtcTheme } from "@/lib/theme";
-import "@coinbase/onchainkit/styles.css";
 
 export function Providers({ children }: { children: ReactNode }) {
   return (

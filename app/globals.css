@@ -23,8 +23,8 @@ body {
 }
 
 body {
-  color: var(--color-text);
-  background: var(--color-bg);
+  color: var(--color-text) !important;
+  background: var(--color-bg) !important;
   font-family: var(--font-inter), system-ui, -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;

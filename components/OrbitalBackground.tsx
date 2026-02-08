@@ -112,8 +112,8 @@ export function OrbitalBackground() {
         // Draw orbit path
         ctx!.beginPath();
         ctx!.ellipse(0, 0, rx, ry, 0, 0, Math.PI * 2);
-        ctx!.strokeStyle = "rgba(247, 147, 26, 0.08)";
-        ctx!.lineWidth = 1;
+        ctx!.strokeStyle = "rgba(247, 147, 26, 0.15)";
+        ctx!.lineWidth = 1.5;
         ctx!.stroke();
 
         // Draw particles along orbit
@@ -126,7 +126,7 @@ export function OrbitalBackground() {
 
           ctx!.beginPath();
           ctx!.arc(px, py, p.size, 0, Math.PI * 2);
-          ctx!.fillStyle = "rgba(247, 147, 26, 0.3)";
+          ctx!.fillStyle = "rgba(247, 147, 26, 0.5)";
           ctx!.fill();
         }
 
