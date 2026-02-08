@@ -1,5 +1,6 @@
 "use client";
 import { useState, useCallback } from "react";
+import Image from "next/image";
 import { OrbitalBackground } from "@/components/OrbitalBackground";
 import { AnalogyDisplay } from "@/components/AnalogyDisplay";
 import { GenerateButton } from "@/components/GenerateButton";
@@ -62,6 +63,14 @@ export default function Home() {
       <section className={styles.hero}>
         <OrbitalBackground />
         <div className={styles.heroContent}>
+          <Image
+            src="/logo.png"
+            alt="1BTC=1BTC logo"
+            width={120}
+            height={120}
+            className={styles.logo}
+            priority
+          />
           <h1 className={styles.title}>1 BTC = 1 BTC</h1>
 
           <AnalogyDisplay analogy={analogy} isLoading={isGenerating} />
