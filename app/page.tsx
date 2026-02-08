@@ -12,6 +12,7 @@ import styles from "./page.module.css";
 
 export default function Home() {
   const [analogy, setAnalogy] = useState<string | null>(null);
+  const [analogyId, setAnalogyId] = useState<string | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [generateError, setGenerateError] = useState<string | null>(null);
   const [mintSuccess, setMintSuccess] = useState<string | null>(null);
@@ -23,6 +24,7 @@ export default function Home() {
   const handleGenerate = useCallback(async () => {
     setIsGenerating(true);
     setAnalogy(null);
+    setAnalogyId(null);
     setGenerateError(null);
     setMintSuccess(null);
 
@@ -34,6 +36,7 @@ export default function Home() {
       }
       const data = await response.json();
       setAnalogy(data.analogy);
+      setAnalogyId(data.analogyId ?? null);
     } catch (error) {
       console.error("Generation failed:", error);
       setGenerateError(
@@ -47,6 +50,7 @@ export default function Home() {
   const handleMintSuccess = useCallback((txHash: string) => {
     setMintSuccess(txHash);
     setAnalogy(null);
+    setAnalogyId(null);
   }, []);
 
   return (
@@ -83,6 +87,7 @@ export default function Home() {
             {analogy && (
               <MintButton
                 analogy={analogy}
+                analogyId={analogyId}
                 onSuccess={handleMintSuccess}
                 onConnect={openWalletModal}
               />

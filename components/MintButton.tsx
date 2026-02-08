@@ -1,18 +1,20 @@
 "use client";
 import { useCallback, useEffect, useRef } from "react";
 import { useAccount, useWriteContract, useWaitForTransactionReceipt } from "wagmi";
-import { contractConfig } from "@/lib/contract";
+import { decodeEventLog } from "viem";
+import { contractConfig, ONEBTC_ABI } from "@/lib/contract";
 import { useMintPrice } from "@/hooks/useMintPrice";
 import styles from "./MintButton.module.css";
 
 interface MintButtonProps {
   analogy: string;
+  analogyId?: string | null;
   onSuccess?: (txHash: string) => void;
   onConnect?: () => void;
 }
 
-export function MintButton({ analogy, onSuccess, onConnect }: MintButtonProps) {
-  const { isConnected } = useAccount();
+export function MintButton({ analogy, analogyId, onSuccess, onConnect }: MintButtonProps) {
+  const { address, isConnected } = useAccount();
   const { priceInWei } = useMintPrice();
 
   const {
@@ -22,7 +24,7 @@ export function MintButton({ analogy, onSuccess, onConnect }: MintButtonProps) {
     error: writeError,
   } = useWriteContract();
 
-  const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({
+  const { data: receipt, isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({
     hash: txHash,
   });
 
@@ -42,14 +44,50 @@ export function MintButton({ analogy, onSuccess, onConnect }: MintButtonProps) {
     });
   }, [isConnected, onConnect, priceInWei, analogy, writeContract]);
 
-  // Notify parent on success (only once)
+  // Notify parent on success (only once) and update MongoDB
   const notifiedRef = useRef(false);
   useEffect(() => {
     if (isSuccess && txHash && onSuccess && !notifiedRef.current) {
       notifiedRef.current = true;
       onSuccess(txHash);
+
+      // Fire-and-forget: update mint status in MongoDB
+      if (analogyId && address && receipt) {
+        let tokenId: number | undefined;
+        try {
+          for (const log of receipt.logs) {
+            try {
+              const decoded = decodeEventLog({
+                abi: ONEBTC_ABI,
+                data: log.data,
+                topics: log.topics,
+              });
+              if (decoded.eventName === "AnalogyMinted") {
+                tokenId = Number((decoded.args as { tokenId: bigint }).tokenId);
+                break;
+              }
+            } catch {
+              // Not our event, skip
+            }
+          }
+        } catch {
+          // Log parsing failed, continue without tokenId
+        }
+
+        fetch(`/api/analogies/${analogyId}/mint`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            minterAddress: address,
+            txHash,
+            ...(tokenId != null ? { tokenId } : {}),
+          }),
+        }).catch(() => {
+          // Silent failure — mint update is best-effort
+        });
+      }
     }
-  }, [isSuccess, txHash, onSuccess]);
+  }, [isSuccess, txHash, onSuccess, analogyId, address, receipt]);
 
   const isPending = isWritePending || isConfirming;
 

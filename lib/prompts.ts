@@ -27,7 +27,11 @@ const DOMAIN_ROSTER = [
   "Draw your analogy from textiles or craft — weaving, thread count, a knot, dyeing, patina.",
 ];
 
-export function getAnalogyUserPrompt(): string {
-  const domain = DOMAIN_ROSTER[Math.floor(Math.random() * DOMAIN_ROSTER.length)];
-  return `Generate one analogy for "1 BTC = 1 BTC."\n\n${domain}`;
+export function getAnalogyUserPrompt(): { prompt: string; domain: string } {
+  const entry = DOMAIN_ROSTER[Math.floor(Math.random() * DOMAIN_ROSTER.length)];
+  // Extract clean domain label: "Draw your analogy from <domain> — ..."
+  const match = entry.match(/^Draw your analogy from (.+?)\s*[—\-]/);
+  const domain = match ? match[1].trim() : "general";
+  const prompt = `Generate one analogy for "1 BTC = 1 BTC."\n\n${entry}`;
+  return { prompt, domain };
 }

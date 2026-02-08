@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
 import { ANALOGY_SYSTEM_PROMPT, getAnalogyUserPrompt } from "@/lib/prompts";
+import { connectToDatabase } from "@/lib/mongodb";
+import { Analogy } from "@/lib/models/Analogy";
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
@@ -48,12 +50,14 @@ export async function POST(request: Request) {
   }
 
   try {
+    const { prompt, domain } = getAnalogyUserPrompt();
+
     const message = await anthropic.messages.create({
       model: "claude-sonnet-4-5-20250929",
       max_tokens: 256,
       temperature: 0.95,
       system: ANALOGY_SYSTEM_PROMPT,
-      messages: [{ role: "user", content: getAnalogyUserPrompt() }],
+      messages: [{ role: "user", content: prompt }],
     });
 
     const textBlock = message.content.find((block) => block.type === "text");
@@ -66,7 +70,17 @@ export async function POST(request: Request) {
       );
     }
 
-    return NextResponse.json({ analogy });
+    // Save to MongoDB (non-blocking — DB failure doesn't block generation)
+    let analogyId: string | null = null;
+    try {
+      await connectToDatabase();
+      const doc = await Analogy.create({ text: analogy, domain });
+      analogyId = doc._id.toString();
+    } catch (dbError) {
+      console.error("MongoDB save failed:", dbError);
+    }
+
+    return NextResponse.json({ analogy, analogyId });
   } catch (error) {
     console.error("Analogy generation error:", error);
     const detail =
