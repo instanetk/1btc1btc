@@ -47,6 +47,12 @@
   justify-content: center;
 }
 
+.errorText {
+  font-size: 0.8125rem;
+  color: #cf202f;
+  text-align: center;
+}
+
 .mintToast {
   font-size: 0.8125rem;
   color: var(--color-accent);

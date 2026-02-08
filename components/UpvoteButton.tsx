@@ -1,4 +1,5 @@
 "use client";
+import { useEffect, useRef } from "react";
 import { useAccount } from "wagmi";
 import { useUpvote } from "@/hooks/useUpvote";
 import styles from "./UpvoteButton.module.css";
@@ -13,9 +14,13 @@ export function UpvoteButton({ tokenId, currentUpvotes, onSuccess }: UpvoteButto
   const { address, isConnected } = useAccount();
   const { upvote, hasVoted, isPending, isSuccess } = useUpvote(tokenId, address);
 
-  if (isSuccess && onSuccess) {
-    onSuccess();
-  }
+  const notifiedRef = useRef(false);
+  useEffect(() => {
+    if (isSuccess && onSuccess && !notifiedRef.current) {
+      notifiedRef.current = true;
+      onSuccess();
+    }
+  }, [isSuccess, onSuccess]);
 
   const voted = hasVoted === true;
 

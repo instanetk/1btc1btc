@@ -1,4 +1,5 @@
 "use client";
+import { useEffect, useRef } from "react";
 import { useReadContract, useWriteContract, useWaitForTransactionReceipt } from "wagmi";
 import { contractConfig } from "@/lib/contract";
 
@@ -32,9 +33,13 @@ export function useUpvote(tokenId: bigint, voterAddress?: `0x${string}`) {
   };
 
   // Refetch voted status after successful tx
-  if (isSuccess) {
-    refetchVoted();
-  }
+  const prevSuccess = useRef(false);
+  useEffect(() => {
+    if (isSuccess && !prevSuccess.current) {
+      prevSuccess.current = true;
+      refetchVoted();
+    }
+  }, [isSuccess, refetchVoted]);
 
   return {
     upvote,

@@ -11,11 +11,13 @@ import styles from "./page.module.css";
 export default function Home() {
   const [analogy, setAnalogy] = useState<string | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [generateError, setGenerateError] = useState<string | null>(null);
   const [mintSuccess, setMintSuccess] = useState<string | null>(null);
 
   const handleGenerate = useCallback(async () => {
     setIsGenerating(true);
     setAnalogy(null);
+    setGenerateError(null);
     setMintSuccess(null);
 
     try {
@@ -28,7 +30,9 @@ export default function Home() {
       setAnalogy(data.analogy);
     } catch (error) {
       console.error("Generation failed:", error);
-      setAnalogy(null);
+      setGenerateError(
+        error instanceof Error ? error.message : "Failed to generate. Please try again."
+      );
     } finally {
       setIsGenerating(false);
     }
@@ -66,6 +70,10 @@ export default function Home() {
               />
             )}
           </div>
+
+          {generateError && (
+            <p className={styles.errorText}>{generateError}</p>
+          )}
 
           {mintSuccess && (
             <p className={styles.mintToast}>

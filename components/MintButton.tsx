@@ -1,5 +1,5 @@
 "use client";
-import { useCallback } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { useAccount, useWriteContract, useWaitForTransactionReceipt } from "wagmi";
 import { contractConfig } from "@/lib/contract";
 import { useMintPrice } from "@/hooks/useMintPrice";
@@ -37,10 +37,14 @@ export function MintButton({ analogy, onSuccess }: MintButtonProps) {
     });
   }, [priceInWei, analogy, writeContract]);
 
-  // Notify parent on success
-  if (isSuccess && txHash && onSuccess) {
-    onSuccess(txHash);
-  }
+  // Notify parent on success (only once)
+  const notifiedRef = useRef(false);
+  useEffect(() => {
+    if (isSuccess && txHash && onSuccess && !notifiedRef.current) {
+      notifiedRef.current = true;
+      onSuccess(txHash);
+    }
+  }, [isSuccess, txHash, onSuccess]);
 
   if (!isConnected) {
     return null;
@@ -62,7 +66,7 @@ export function MintButton({ analogy, onSuccess }: MintButtonProps) {
       >
         {isPending
           ? "Minting..."
-          : `Mint this thought · ${displayPrice}`}
+          : `Mint this thought \u00b7 ${displayPrice}`}
       </button>
       {writeError && (
         <p className={styles.error}>
