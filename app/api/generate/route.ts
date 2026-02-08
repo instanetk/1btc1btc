@@ -68,8 +68,12 @@ export async function POST(request: Request) {
     return NextResponse.json({ analogy });
   } catch (error) {
     console.error("Analogy generation error:", error);
+    const detail =
+      process.env.NODE_ENV === "development" && error instanceof Error
+        ? error.message
+        : "Please try again.";
     return NextResponse.json(
-      { error: "Failed to generate analogy. Please try again." },
+      { error: `Failed to generate analogy. ${detail}` },
       { status: 500 }
     );
   }

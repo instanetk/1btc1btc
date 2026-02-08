@@ -1,10 +1,11 @@
 "use client";
 import { useState, useCallback } from "react";
-import { Wallet } from "@coinbase/onchainkit/wallet";
-import { GrainOverlay } from "@/components/GrainOverlay";
+import { OrbitalBackground } from "@/components/OrbitalBackground";
 import { AnalogyDisplay } from "@/components/AnalogyDisplay";
 import { GenerateButton } from "@/components/GenerateButton";
 import { MintButton } from "@/components/MintButton";
+import { ConnectButton } from "@/components/ConnectButton";
+import { WalletModal } from "@/components/WalletModal";
 import { Gallery } from "@/components/Gallery";
 import styles from "./page.module.css";
 
@@ -13,6 +14,10 @@ export default function Home() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [generateError, setGenerateError] = useState<string | null>(null);
   const [mintSuccess, setMintSuccess] = useState<string | null>(null);
+  const [walletModalOpen, setWalletModalOpen] = useState(false);
+
+  const openWalletModal = useCallback(() => setWalletModalOpen(true), []);
+  const closeWalletModal = useCallback(() => setWalletModalOpen(false), []);
 
   const handleGenerate = useCallback(async () => {
     setIsGenerating(true);
@@ -47,12 +52,15 @@ export default function Home() {
     <div className={styles.container}>
       {/* Wallet connect — top right */}
       <header className={styles.header}>
-        <Wallet />
+        <ConnectButton onConnect={openWalletModal} />
       </header>
+
+      {/* Wallet modal */}
+      <WalletModal isOpen={walletModalOpen} onClose={closeWalletModal} />
 
       {/* Hero section */}
       <section className={styles.hero}>
-        <GrainOverlay />
+        <OrbitalBackground />
         <div className={styles.heroContent}>
           <h1 className={styles.title}>1 BTC = 1 BTC</h1>
 
@@ -67,6 +75,7 @@ export default function Home() {
               <MintButton
                 analogy={analogy}
                 onSuccess={handleMintSuccess}
+                onConnect={openWalletModal}
               />
             )}
           </div>
@@ -90,7 +99,8 @@ export default function Home() {
           )}
 
           <div className={styles.scrollHint}>
-            <span>&#8595; Gallery</span>
+            <span className={styles.scrollLabel}>GALLERY</span>
+            <span className={styles.scrollArrow}>&darr;</span>
           </div>
         </div>
       </section>

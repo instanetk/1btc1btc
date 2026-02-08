@@ -1,6 +1,7 @@
 :root {
   --color-bg: #0A0A0A;
-  --color-bg-card: #111111;
+  --color-bg-card: #FFFFFF;
+  --color-card-text: #1a1a1a;
   --color-text: #F5F0E8;
   --color-text-muted: #666666;
   --color-accent: #F7931A;
@@ -52,41 +53,6 @@ a {
   }
   to {
     opacity: 0;
-  }
-}
-
-/* Grain texture overlay */
-@keyframes grain {
-  0%,
-  100% {
-    transform: translate(0, 0);
-  }
-  10% {
-    transform: translate(-5%, -10%);
-  }
-  20% {
-    transform: translate(-15%, 5%);
-  }
-  30% {
-    transform: translate(7%, -25%);
-  }
-  40% {
-    transform: translate(-5%, 25%);
-  }
-  50% {
-    transform: translate(-15%, 10%);
-  }
-  60% {
-    transform: translate(15%, 0%);
-  }
-  70% {
-    transform: translate(0%, 15%);
-  }
-  80% {
-    transform: translate(3%, 35%);
-  }
-  90% {
-    transform: translate(-10%, 10%);
   }
 }
 

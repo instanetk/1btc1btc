@@ -16,7 +16,7 @@ export function Providers({ children }: { children: ReactNode }) {
           chain={base}
           config={{
             appearance: {
-              mode: "auto",
+              mode: "dark",
             },
             wallet: {
               display: "modal",

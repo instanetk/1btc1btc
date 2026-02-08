@@ -8,9 +8,10 @@ import styles from "./MintButton.module.css";
 interface MintButtonProps {
   analogy: string;
   onSuccess?: (txHash: string) => void;
+  onConnect?: () => void;
 }
 
-export function MintButton({ analogy, onSuccess }: MintButtonProps) {
+export function MintButton({ analogy, onSuccess, onConnect }: MintButtonProps) {
   const { isConnected } = useAccount();
   const { priceInWei, priceInETH, isLoading: priceLoading } = useMintPrice();
 
@@ -25,7 +26,11 @@ export function MintButton({ analogy, onSuccess }: MintButtonProps) {
     hash: txHash,
   });
 
-  const handleMint = useCallback(() => {
+  const handleClick = useCallback(() => {
+    if (!isConnected) {
+      onConnect?.();
+      return;
+    }
     if (!priceInWei) return;
     // Add 2% buffer to account for price movement
     const valueWithBuffer = (priceInWei * 102n) / 100n;
@@ -35,7 +40,7 @@ export function MintButton({ analogy, onSuccess }: MintButtonProps) {
       args: [analogy],
       value: valueWithBuffer,
     });
-  }, [priceInWei, analogy, writeContract]);
+  }, [isConnected, onConnect, priceInWei, analogy, writeContract]);
 
   // Notify parent on success (only once)
   const notifiedRef = useRef(false);
@@ -46,27 +51,18 @@ export function MintButton({ analogy, onSuccess }: MintButtonProps) {
     }
   }, [isSuccess, txHash, onSuccess]);
 
-  if (!isConnected) {
-    return null;
-  }
-
   const isPending = isWritePending || isConfirming;
-  const displayPrice = priceLoading
-    ? "..."
-    : priceInETH
-      ? `${Number(priceInETH).toFixed(6)} ETH`
-      : "...";
 
   return (
     <div>
       <button
         className={styles.button}
-        onClick={handleMint}
-        disabled={isPending || priceLoading || !priceInWei}
+        onClick={handleClick}
+        disabled={isPending}
       >
         {isPending
           ? "Minting..."
-          : `Mint this thought \u00b7 ${displayPrice}`}
+          : "Mint this thought \u00b7 1000 SATS"}
       </button>
       {writeError && (
         <p className={styles.error}>
