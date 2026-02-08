@@ -1,0 +1,47 @@
+"use client";
+import { useAccount } from "wagmi";
+import { useUpvote } from "@/hooks/useUpvote";
+import styles from "./UpvoteButton.module.css";
+
+interface UpvoteButtonProps {
+  tokenId: bigint;
+  currentUpvotes: number;
+  onSuccess?: () => void;
+}
+
+export function UpvoteButton({ tokenId, currentUpvotes, onSuccess }: UpvoteButtonProps) {
+  const { address, isConnected } = useAccount();
+  const { upvote, hasVoted, isPending, isSuccess } = useUpvote(tokenId, address);
+
+  if (isSuccess && onSuccess) {
+    onSuccess();
+  }
+
+  const voted = hasVoted === true;
+
+  return (
+    <button
+      className={`${styles.button} ${voted ? styles.voted : ""}`}
+      onClick={upvote}
+      disabled={!isConnected || voted || isPending}
+      title={!isConnected ? "Connect wallet to upvote" : voted ? "Already voted" : "Upvote"}
+    >
+      <svg
+        className={styles.icon}
+        width="14"
+        height="14"
+        viewBox="0 0 14 14"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          d="M7 2L12 8H2L7 2Z"
+          fill="currentColor"
+        />
+      </svg>
+      <span className={styles.count}>
+        {isPending ? currentUpvotes + 1 : currentUpvotes}
+      </span>
+    </button>
+  );
+}

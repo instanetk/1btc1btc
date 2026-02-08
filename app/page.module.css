@@ -1,39 +1,98 @@
 .container {
-  display: grid;
-  grid-template-rows: auto 1fr;
   min-height: 100vh;
 }
 
-.headerWrapper {
-  display: flex;
-  justify-content: flex-end;
+.header {
+  position: fixed;
+  top: 0;
+  right: 0;
   padding: 1rem;
-  position: relative;
-  z-index: 10;
+  z-index: 100;
 }
 
 .hero {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.heroContent {
+  position: relative;
+  z-index: 2;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 1.5rem;
+  gap: 2rem;
   padding: 2rem;
+  width: 100%;
+  max-width: 720px;
 }
 
 .title {
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
   font-weight: 600;
-  letter-spacing: 0.25em;
+  letter-spacing: 0.3em;
   text-transform: uppercase;
   color: var(--color-text-muted);
 }
 
-.placeholder {
-  font-size: 1.75rem;
-  font-weight: 400;
-  line-height: 1.4;
+.buttons {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.mintToast {
+  font-size: 0.8125rem;
+  color: var(--color-accent);
   text-align: center;
-  max-width: 640px;
+  animation: fadeIn 0.5s ease-out;
+}
+
+.txLink {
+  color: var(--color-accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.txLink:hover {
+  opacity: 0.8;
+}
+
+.scrollHint {
+  position: absolute;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.75rem;
   color: var(--color-text-muted);
+  animation: bounce 2s ease-in-out infinite;
+  opacity: 0.6;
+}
+
+.divider {
+  height: 1px;
+  background: var(--color-border);
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+@media (max-width: 480px) {
+  .heroContent {
+    padding: 1.5rem 1rem;
+  }
+
+  .buttons {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .buttons > * {
+    width: 100%;
+  }
 }
