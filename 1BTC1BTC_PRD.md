@@ -407,6 +407,7 @@ NEXT_PUBLIC_CHAIN_ID=8453                # Base mainnet
 - "Collect" existing mints from other users
 - SATS-native payment (Lightning integration)
 - Subgraph / indexer for faster gallery loading at scale
+- **Semantic hashtags** — Use a second LLM call (or structured output from the first) to extract 3-5 thematic tags from each generated analogy (e.g. "#wine #scarcity #taste #1947"). Store tags off-chain in a KV store keyed by tokenId. Enable gallery filtering/grouping by tag. The generation domain (math, music, cooking, etc.) can serve as a coarse tag in the interim.
 
 ---
 
