@@ -1,7 +1,7 @@
 import { CONTRACT_ADDRESS } from "./constants";
 
-// ABI will be populated after Foundry compilation in Phase 3.
-// Placeholder with the functions we know the contract will have.
+// ABI extracted from Foundry compilation of contracts/src/OnebtcOnebtc.sol
+// Contains only the functions/events used by the frontend.
 export const ONEBTC_ABI = [
   {
     type: "function",
