@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
-import { ANALOGY_SYSTEM_PROMPT, ANALOGY_USER_PROMPT } from "@/lib/prompts";
+import { ANALOGY_SYSTEM_PROMPT, getAnalogyUserPrompt } from "@/lib/prompts";
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
@@ -51,8 +51,9 @@ export async function POST(request: Request) {
     const message = await anthropic.messages.create({
       model: "claude-sonnet-4-5-20250929",
       max_tokens: 256,
+      temperature: 0.95,
       system: ANALOGY_SYSTEM_PROMPT,
-      messages: [{ role: "user", content: ANALOGY_USER_PROMPT }],
+      messages: [{ role: "user", content: getAnalogyUserPrompt() }],
     });
 
     const textBlock = message.content.find((block) => block.type === "text");
