@@ -11,9 +11,10 @@ interface MintButtonProps {
   analogyId?: string | null;
   onSuccess?: (txHash: string) => void;
   onConnect?: () => void;
+  compact?: boolean;
 }
 
-export function MintButton({ analogy, analogyId, onSuccess, onConnect }: MintButtonProps) {
+export function MintButton({ analogy, analogyId, onSuccess, onConnect, compact }: MintButtonProps) {
   const { address, isConnected } = useAccount();
   const { priceInWei } = useMintPrice();
 
@@ -94,13 +95,15 @@ export function MintButton({ analogy, analogyId, onSuccess, onConnect }: MintBut
   return (
     <div>
       <button
-        className={styles.button}
+        className={compact ? `${styles.button} ${styles.compact}` : styles.button}
         onClick={handleClick}
         disabled={isPending}
       >
         {isPending
           ? "Minting..."
-          : "Mint this thought \u00b7 1000 SATS"}
+          : compact
+            ? "Mint \u00b7 1000 SATS"
+            : "Mint this thought \u00b7 1000 SATS"}
       </button>
       {writeError && (
         <p className={styles.error}>

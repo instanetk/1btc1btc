@@ -8,6 +8,7 @@ import { MintButton } from "@/components/MintButton";
 import { ConnectButton } from "@/components/ConnectButton";
 import { WalletModal } from "@/components/WalletModal";
 import { Gallery } from "@/components/Gallery";
+import { GeneratedGallery } from "@/components/GeneratedGallery";
 import styles from "./page.module.css";
 
 export default function Home() {
@@ -124,6 +125,12 @@ export default function Home() {
 
       {/* Gallery section */}
       <Gallery />
+
+      {/* Divider */}
+      <div className={styles.divider} />
+
+      {/* Generated (unminted) thoughts */}
+      <GeneratedGallery onConnect={openWalletModal} />
     </div>
   );
 }
