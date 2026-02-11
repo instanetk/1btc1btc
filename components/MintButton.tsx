@@ -93,7 +93,7 @@ export function MintButton({ analogy, analogyId, onSuccess, onConnect, compact }
   const isPending = isWritePending || isConfirming;
 
   return (
-    <div>
+    <div className={styles.wrapper}>
       <button
         className={compact ? `${styles.button} ${styles.compact}` : styles.button}
         onClick={handleClick}
