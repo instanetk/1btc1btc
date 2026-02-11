@@ -1,6 +1,6 @@
 .card {
-  background: var(--color-bg-card);
-  border: 1px solid #E5E5E5;
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 12px;
   padding: 1.25rem;
   display: flex;
@@ -11,13 +11,13 @@
 }
 
 .card:hover {
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
 }
 
 .analogy {
   font-size: 0.9375rem;
   line-height: 1.6;
-  color: var(--color-card-text);
+  color: rgba(255, 255, 255, 0.9);
   overflow-wrap: break-word;
 }
 
@@ -45,7 +45,7 @@
 
 .name {
   font-size: 0.75rem !important;
-  color: #888 !important;
+  color: rgba(255, 255, 255, 0.5) !important;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -53,6 +53,6 @@
 
 .mintNumber {
   font-size: 0.75rem;
-  color: #888;
+  color: rgba(255, 255, 255, 0.5);
   flex-shrink: 0;
 }
