@@ -20,11 +20,14 @@ const UPVOTED_EVENT = parseAbiItem(
   "event Upvoted(uint256 indexed tokenId, address indexed voter)"
 );
 
+const PAGE_SIZE = 9;
+
 export function useGallery() {
   const publicClient = usePublicClient();
   const [items, setItems] = useState<GalleryItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [sort, setSort] = useState<SortMode>("top");
+  const [page, setPage] = useState(0);
 
   const fetchGallery = useCallback(async () => {
     if (!publicClient || !CONTRACT_ADDRESS || CONTRACT_ADDRESS === "0x0000000000000000000000000000000000000000") {
@@ -78,6 +81,12 @@ export function useGallery() {
     fetchGallery();
   }, [fetchGallery]);
 
+  // Reset page when sort changes
+  const handleSetSort = useCallback((s: SortMode) => {
+    setSort(s);
+    setPage(0);
+  }, []);
+
   // Sort items
   const sortedItems = [...items].sort((a, b) => {
     if (sort === "top") {
@@ -86,11 +95,17 @@ export function useGallery() {
     return Number(b.tokenId - a.tokenId);
   });
 
+  const totalPages = Math.max(1, Math.ceil(sortedItems.length / PAGE_SIZE));
+  const pagedItems = sortedItems.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
+
   return {
-    items: sortedItems,
+    items: pagedItems,
     isLoading,
     refetch: fetchGallery,
     sort,
-    setSort,
+    setSort: handleSetSort,
+    page,
+    setPage,
+    totalPages,
   };
 }

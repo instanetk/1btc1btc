@@ -5,7 +5,7 @@ import { GallerySortToggle } from "./GallerySortToggle";
 import styles from "./Gallery.module.css";
 
 export function Gallery() {
-  const { items, isLoading, refetch, sort, setSort } = useGallery();
+  const { items, isLoading, refetch, sort, setSort, page, setPage, totalPages } = useGallery();
 
   return (
     <section className={styles.section} id="gallery">
@@ -23,15 +23,38 @@ export function Gallery() {
           <p>No thoughts minted yet. Be the first.</p>
         </div>
       ) : (
-        <div className={styles.grid}>
-          {items.map((item) => (
-            <GalleryCard
-              key={item.tokenId.toString()}
-              item={item}
-              onUpvoteSuccess={refetch}
-            />
-          ))}
-        </div>
+        <>
+          <div className={styles.grid}>
+            {items.map((item) => (
+              <GalleryCard
+                key={item.tokenId.toString()}
+                item={item}
+                onUpvoteSuccess={refetch}
+              />
+            ))}
+          </div>
+          {totalPages > 1 && (
+            <div className={styles.pagination}>
+              <button
+                className={styles.pageButton}
+                onClick={() => setPage(page - 1)}
+                disabled={page === 0}
+              >
+                &larr; Prev
+              </button>
+              <span className={styles.pageInfo}>
+                {page + 1} / {totalPages}
+              </span>
+              <button
+                className={styles.pageButton}
+                onClick={() => setPage(page + 1)}
+                disabled={page >= totalPages - 1}
+              >
+                Next &rarr;
+              </button>
+            </div>
+          )}
+        </>
       )}
     </section>
   );
