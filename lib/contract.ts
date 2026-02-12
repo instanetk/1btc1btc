@@ -1,4 +1,4 @@
-import { CONTRACT_ADDRESS } from "./constants";
+import { CONTRACT_ADDRESS, CHAIN_ID } from "./constants";
 
 // ABI extracted from Foundry compilation of contracts/src/OnebtcOnebtc.sol
 // Contains only the functions/events used by the frontend.
@@ -84,4 +84,5 @@ export const ONEBTC_ABI = [
 export const contractConfig = {
   address: CONTRACT_ADDRESS as `0x${string}`,
   abi: ONEBTC_ABI,
+  chainId: CHAIN_ID,
 } as const;

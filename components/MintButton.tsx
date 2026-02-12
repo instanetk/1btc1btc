@@ -97,13 +97,15 @@ export function MintButton({ analogy, analogyId, onSuccess, onConnect, compact }
       <button
         className={compact ? `${styles.button} ${styles.compact}` : styles.button}
         onClick={handleClick}
-        disabled={isPending}
+        disabled={isPending || isSuccess}
       >
-        {isPending
-          ? "Minting..."
-          : compact
-            ? "Mint \u00b7 1000 SATS"
-            : "Mint this thought \u00b7 1000 SATS"}
+        {isSuccess
+          ? "Minted!"
+          : isPending
+            ? "Minting..."
+            : compact
+              ? "Mint \u00b7 1000 SATS"
+              : "Mint this thought \u00b7 1000 SATS"}
       </button>
       {writeError && (
         <p className={styles.error}>

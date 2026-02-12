@@ -2,7 +2,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { usePublicClient } from "wagmi";
 import { parseAbiItem } from "viem";
-import { CONTRACT_ADDRESS } from "@/lib/constants";
+import { CONTRACT_ADDRESS, CHAIN_ID } from "@/lib/constants";
 
 export type GalleryItem = {
   tokenId: bigint;
@@ -21,9 +21,29 @@ const UPVOTED_EVENT = parseAbiItem(
 );
 
 const PAGE_SIZE = 9;
+const CHUNK_SIZE = 1000n;
+// Block at which the contract was deployed (avoids scanning entire chain history)
+const DEPLOY_BLOCK = BigInt(process.env.NEXT_PUBLIC_DEPLOY_BLOCK ?? "0");
+
+// Fetch logs in chunks of CHUNK_SIZE blocks to stay within RPC limits
+async function getLogsChunked<T>(
+  publicClient: ReturnType<typeof usePublicClient>,
+  params: { address: `0x${string}`; event: T; fromBlock: bigint; toBlock: bigint },
+) {
+  const results: Awaited<ReturnType<NonNullable<typeof publicClient>["getLogs"]>> = [];
+  let from = params.fromBlock;
+  while (from <= params.toBlock) {
+    const to = from + CHUNK_SIZE - 1n > params.toBlock ? params.toBlock : from + CHUNK_SIZE - 1n;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const logs = await publicClient!.getLogs({ ...params, fromBlock: from, toBlock: to } as any);
+    results.push(...logs);
+    from = to + 1n;
+  }
+  return results;
+}
 
 export function useGallery() {
-  const publicClient = usePublicClient();
+  const publicClient = usePublicClient({ chainId: CHAIN_ID });
   const [items, setItems] = useState<GalleryItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [sort, setSort] = useState<SortMode>("top");
@@ -38,20 +58,22 @@ export function useGallery() {
     try {
       setIsLoading(true);
 
+      const latestBlock = await publicClient.getBlockNumber();
+
       // Fetch AnalogyMinted events
-      const mintLogs = await publicClient.getLogs({
+      const mintLogs = await getLogsChunked(publicClient, {
         address: CONTRACT_ADDRESS as `0x${string}`,
         event: ANALOGY_MINTED_EVENT,
-        fromBlock: 0n,
-        toBlock: "latest",
+        fromBlock: DEPLOY_BLOCK,
+        toBlock: latestBlock,
       });
 
       // Fetch Upvoted events
-      const upvoteLogs = await publicClient.getLogs({
+      const upvoteLogs = await getLogsChunked(publicClient, {
         address: CONTRACT_ADDRESS as `0x${string}`,
         event: UPVOTED_EVENT,
-        fromBlock: 0n,
-        toBlock: "latest",
+        fromBlock: DEPLOY_BLOCK,
+        toBlock: latestBlock,
       });
 
       // Count upvotes per tokenId

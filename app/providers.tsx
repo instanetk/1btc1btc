@@ -1,7 +1,7 @@
 "use client";
 import { ReactNode } from "react";
-import { base } from "wagmi/chains";
 import { OnchainKitProvider } from "@coinbase/onchainkit";
+import { CHAIN } from "@/lib/constants";
 import { ThemeProvider } from "@coinbase/cds-web";
 import { MediaQueryProvider } from "@coinbase/cds-web/system";
 import { onebtcTheme } from "@/lib/theme";
@@ -12,7 +12,7 @@ export function Providers({ children }: { children: ReactNode }) {
       <ThemeProvider theme={onebtcTheme} activeColorScheme="dark">
         <OnchainKitProvider
           apiKey={process.env.NEXT_PUBLIC_ONCHAINKIT_API_KEY}
-          chain={base}
+          chain={CHAIN}
           config={{
             appearance: {
               mode: "dark",
