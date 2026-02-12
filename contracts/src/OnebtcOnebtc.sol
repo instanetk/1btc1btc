@@ -4,6 +4,7 @@ pragma solidity ^0.8.24;
 import {ERC721} from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import {ERC2981} from "@openzeppelin/contracts/token/common/ERC2981.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
+import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
 import {Base64} from "@openzeppelin/contracts/utils/Base64.sol";
 
@@ -16,12 +17,13 @@ interface AggregatorV3Interface {
     function decimals() external view returns (uint8);
 }
 
-contract OnebtcOnebtc is ERC721, ERC2981, Ownable {
+contract OnebtcOnebtc is ERC721, ERC2981, Ownable, ReentrancyGuard {
     using Strings for uint256;
     using Strings for address;
 
     uint256 public constant MINT_COST_SATS = 1000;
     uint256 public constant TOLERANCE_BPS = 100; // 1% tolerance
+    uint256 public constant ORACLE_STALENESS = 3600; // 1 hour
 
     AggregatorV3Interface public immutable BTC_USD_FEED;
     AggregatorV3Interface public immutable ETH_USD_FEED;
@@ -47,10 +49,12 @@ contract OnebtcOnebtc is ERC721, ERC2981, Ownable {
 
     /// @notice Returns the current mint price in wei (ETH equivalent of 1000 SATS)
     function getMintPriceInEth() public view returns (uint256) {
-        (, int256 btcUsdPrice,,,) = BTC_USD_FEED.latestRoundData();
-        (, int256 ethUsdPrice,,,) = ETH_USD_FEED.latestRoundData();
+        (, int256 btcUsdPrice,, uint256 btcUpdatedAt,) = BTC_USD_FEED.latestRoundData();
+        (, int256 ethUsdPrice,, uint256 ethUpdatedAt,) = ETH_USD_FEED.latestRoundData();
 
         require(btcUsdPrice > 0 && ethUsdPrice > 0, "Invalid oracle price");
+        require(block.timestamp - btcUpdatedAt < ORACLE_STALENESS, "Stale BTC price");
+        require(block.timestamp - ethUpdatedAt < ORACLE_STALENESS, "Stale ETH price");
 
         uint8 btcDecimals = BTC_USD_FEED.decimals();
         uint8 ethDecimals = ETH_USD_FEED.decimals();
@@ -70,7 +74,7 @@ contract OnebtcOnebtc is ERC721, ERC2981, Ownable {
     }
 
     /// @notice Mint an analogy as an NFT
-    function mint(string calldata analogy) external payable {
+    function mint(string calldata analogy) external payable nonReentrant {
         require(bytes(analogy).length > 0, "Empty analogy");
         require(bytes(analogy).length <= 1000, "Analogy too long");
 
@@ -121,7 +125,9 @@ contract OnebtcOnebtc is ERC721, ERC2981, Ownable {
     function tokenURI(uint256 tokenId) public view override returns (string memory) {
         require(tokenId < totalSupply, "Token does not exist");
 
-        string memory analogy = analogies[tokenId];
+        string memory rawAnalogy = analogies[tokenId];
+        string memory analogySvg = _escapeXml(rawAnalogy);
+        string memory analogyJson = _escapeJson(rawAnalogy);
         string memory tokenIdStr = tokenId.toString();
 
         // 1BTC1BTC logo — top center brand mark
@@ -151,7 +157,7 @@ contract OnebtcOnebtc is ERC721, ERC2981, Ownable {
                 'style="display:flex;align-items:center;justify-content:center;height:100%">'
                 '<p style="color:#F5F0E8;font-family:Georgia,serif;font-size:22px;'
                 'text-align:center;line-height:1.6;margin:0;">',
-                analogy,
+                analogySvg,
                 "</p></div></foreignObject>"
             )
         );
@@ -174,7 +180,7 @@ contract OnebtcOnebtc is ERC721, ERC2981, Ownable {
                 '{"name":"1BTC1BTC #',
                 tokenIdStr,
                 '","description":"',
-                analogy,
+                analogyJson,
                 '","image":"data:image/svg+xml;base64,',
                 Base64.encode(bytes(svg)),
                 '"}'
@@ -237,6 +243,53 @@ contract OnebtcOnebtc is ERC721, ERC2981, Ownable {
                 '" r="4" fill="#F7931A" opacity="0.4"/></g>'
             )
         );
+    }
+
+    /// @dev Escapes special characters for safe SVG/XHTML embedding
+    function _escapeXml(string memory input) private pure returns (string memory) {
+        bytes memory b = bytes(input);
+        // First pass: count extra bytes needed
+        uint256 extra = 0;
+        for (uint256 i = 0; i < b.length; i++) {
+            bytes1 c = b[i];
+            if (c == "&") extra += 4;       // & → &amp; (+4)
+            else if (c == "<") extra += 3;  // < → &lt; (+3)
+            else if (c == ">") extra += 3;  // > → &gt; (+3)
+            else if (c == '"') extra += 5;  // " → &quot; (+5)
+        }
+        if (extra == 0) return input;
+        // Second pass: build escaped string
+        bytes memory escaped = new bytes(b.length + extra);
+        uint256 j = 0;
+        for (uint256 i = 0; i < b.length; i++) {
+            bytes1 c = b[i];
+            if (c == "&") { escaped[j++] = "&"; escaped[j++] = "a"; escaped[j++] = "m"; escaped[j++] = "p"; escaped[j++] = ";"; }
+            else if (c == "<") { escaped[j++] = "&"; escaped[j++] = "l"; escaped[j++] = "t"; escaped[j++] = ";"; }
+            else if (c == ">") { escaped[j++] = "&"; escaped[j++] = "g"; escaped[j++] = "t"; escaped[j++] = ";"; }
+            else if (c == '"') { escaped[j++] = "&"; escaped[j++] = "q"; escaped[j++] = "u"; escaped[j++] = "o"; escaped[j++] = "t"; escaped[j++] = ";"; }
+            else { escaped[j++] = c; }
+        }
+        return string(escaped);
+    }
+
+    /// @dev Escapes special characters for safe JSON string embedding
+    function _escapeJson(string memory input) private pure returns (string memory) {
+        bytes memory b = bytes(input);
+        uint256 extra = 0;
+        for (uint256 i = 0; i < b.length; i++) {
+            bytes1 c = b[i];
+            if (c == '"' || c == "\\") extra += 1; // " → \" (+1), \ → \\ (+1)
+        }
+        if (extra == 0) return input;
+        bytes memory escaped = new bytes(b.length + extra);
+        uint256 j = 0;
+        for (uint256 i = 0; i < b.length; i++) {
+            bytes1 c = b[i];
+            if (c == '"') { escaped[j++] = "\\"; escaped[j++] = '"'; }
+            else if (c == "\\") { escaped[j++] = "\\"; escaped[j++] = "\\"; }
+            else { escaped[j++] = c; }
+        }
+        return string(escaped);
     }
 
     /// @notice Withdraw accumulated ETH (owner only)
