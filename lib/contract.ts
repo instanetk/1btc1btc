@@ -19,7 +19,7 @@ export const ONEBTC_ABI = [
   },
   {
     type: "function",
-    name: "getMintPriceInETH",
+    name: "getMintPriceInEth",
     inputs: [],
     outputs: [{ name: "", type: "uint256", internalType: "uint256" }],
     stateMutability: "view",

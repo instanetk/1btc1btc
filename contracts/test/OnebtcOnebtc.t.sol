@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
-import {Test, console} from "forge-std/Test.sol";
+import {Test} from "forge-std/Test.sol";
 import {OnebtcOnebtc} from "../src/OnebtcOnebtc.sol";
 
 // Mock Chainlink aggregator
@@ -53,8 +53,8 @@ contract OnebtcOnebtcTest is Test {
         vm.deal(voter, 10 ether);
     }
 
-    function test_getMintPriceInETH() public view {
-        uint256 price = nft.getMintPriceInETH();
+    function test_getMintPriceInEth() public view {
+        uint256 price = nft.getMintPriceInEth();
         // 1000 sats = 1000/1e8 BTC = 0.00001 BTC
         // 0.00001 BTC * $100,000 = $1.00
         // $1.00 / $3,000 = 0.000333... ETH
@@ -63,7 +63,7 @@ contract OnebtcOnebtcTest is Test {
     }
 
     function test_mint() public {
-        uint256 price = nft.getMintPriceInETH();
+        uint256 price = nft.getMintPriceInEth();
         string memory analogy = "A river does not ask how many buckets it equals.";
 
         vm.prank(minter);
@@ -75,7 +75,7 @@ contract OnebtcOnebtcTest is Test {
     }
 
     function test_mint_refundsExcess() public {
-        uint256 price = nft.getMintPriceInETH();
+        uint256 price = nft.getMintPriceInEth();
         uint256 overpay = price * 2;
         uint256 balanceBefore = minter.balance;
 
@@ -88,7 +88,7 @@ contract OnebtcOnebtcTest is Test {
     }
 
     function test_mint_failsWithInsufficientPayment() public {
-        uint256 price = nft.getMintPriceInETH();
+        uint256 price = nft.getMintPriceInEth();
 
         vm.prank(minter);
         vm.expectRevert("Insufficient payment");
@@ -96,7 +96,7 @@ contract OnebtcOnebtcTest is Test {
     }
 
     function test_mint_failsWithEmptyAnalogy() public {
-        uint256 price = nft.getMintPriceInETH();
+        uint256 price = nft.getMintPriceInEth();
 
         vm.prank(minter);
         vm.expectRevert("Empty analogy");
@@ -104,7 +104,7 @@ contract OnebtcOnebtcTest is Test {
     }
 
     function test_upvote() public {
-        uint256 price = nft.getMintPriceInETH();
+        uint256 price = nft.getMintPriceInEth();
 
         vm.prank(minter);
         nft.mint{value: price}("Test analogy.");
@@ -117,7 +117,7 @@ contract OnebtcOnebtcTest is Test {
     }
 
     function test_upvote_failsDoubleVote() public {
-        uint256 price = nft.getMintPriceInETH();
+        uint256 price = nft.getMintPriceInEth();
 
         vm.prank(minter);
         nft.mint{value: price}("Test analogy.");
@@ -137,7 +137,7 @@ contract OnebtcOnebtcTest is Test {
     }
 
     function test_tokenURI() public {
-        uint256 price = nft.getMintPriceInETH();
+        uint256 price = nft.getMintPriceInEth();
 
         vm.prank(minter);
         nft.mint{value: price}("One bitcoin is one bitcoin.");
@@ -153,7 +153,7 @@ contract OnebtcOnebtcTest is Test {
     }
 
     function test_withdraw() public {
-        uint256 price = nft.getMintPriceInETH();
+        uint256 price = nft.getMintPriceInEth();
 
         vm.prank(minter);
         nft.mint{value: price}("Test analogy.");
@@ -169,7 +169,7 @@ contract OnebtcOnebtcTest is Test {
     }
 
     function test_withdraw_failsNonOwner() public {
-        uint256 price = nft.getMintPriceInETH();
+        uint256 price = nft.getMintPriceInEth();
 
         vm.prank(minter);
         nft.mint{value: price}("Test analogy.");
@@ -180,7 +180,7 @@ contract OnebtcOnebtcTest is Test {
     }
 
     function test_royaltyInfo() public {
-        uint256 price = nft.getMintPriceInETH();
+        uint256 price = nft.getMintPriceInEth();
 
         vm.prank(minter);
         nft.mint{value: price}("Test analogy.");
@@ -191,7 +191,7 @@ contract OnebtcOnebtcTest is Test {
     }
 
     function test_multipleMints() public {
-        uint256 price = nft.getMintPriceInETH();
+        uint256 price = nft.getMintPriceInEth();
 
         vm.startPrank(minter);
         nft.mint{value: price}("First thought.");

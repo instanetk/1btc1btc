@@ -23,8 +23,8 @@ contract OnebtcOnebtc is ERC721, ERC2981, Ownable {
     uint256 public constant MINT_COST_SATS = 1000;
     uint256 public constant TOLERANCE_BPS = 100; // 1% tolerance
 
-    AggregatorV3Interface public immutable btcUsdFeed;
-    AggregatorV3Interface public immutable ethUsdFeed;
+    AggregatorV3Interface public immutable BTC_USD_FEED;
+    AggregatorV3Interface public immutable ETH_USD_FEED;
 
     uint256 public totalSupply;
 
@@ -40,20 +40,20 @@ contract OnebtcOnebtc is ERC721, ERC2981, Ownable {
         address _ethUsdFeed,
         address _royaltyRecipient
     ) ERC721("1BTC1BTC", "ONEBTC") Ownable(msg.sender) {
-        btcUsdFeed = AggregatorV3Interface(_btcUsdFeed);
-        ethUsdFeed = AggregatorV3Interface(_ethUsdFeed);
+        BTC_USD_FEED = AggregatorV3Interface(_btcUsdFeed);
+        ETH_USD_FEED = AggregatorV3Interface(_ethUsdFeed);
         _setDefaultRoyalty(_royaltyRecipient, 2500); // 25%
     }
 
     /// @notice Returns the current mint price in wei (ETH equivalent of 1000 SATS)
-    function getMintPriceInETH() public view returns (uint256) {
-        (, int256 btcUsdPrice,,,) = btcUsdFeed.latestRoundData();
-        (, int256 ethUsdPrice,,,) = ethUsdFeed.latestRoundData();
+    function getMintPriceInEth() public view returns (uint256) {
+        (, int256 btcUsdPrice,,,) = BTC_USD_FEED.latestRoundData();
+        (, int256 ethUsdPrice,,,) = ETH_USD_FEED.latestRoundData();
 
         require(btcUsdPrice > 0 && ethUsdPrice > 0, "Invalid oracle price");
 
-        uint8 btcDecimals = btcUsdFeed.decimals();
-        uint8 ethDecimals = ethUsdFeed.decimals();
+        uint8 btcDecimals = BTC_USD_FEED.decimals();
+        uint8 ethDecimals = ETH_USD_FEED.decimals();
 
         // 1000 sats = 1000 / 1e8 BTC
         // Value in USD = (1000 / 1e8) * btcUsdPrice / 10^btcDecimals
@@ -61,7 +61,9 @@ contract OnebtcOnebtc is ERC721, ERC2981, Ownable {
         // Value in wei = valueInETH * 1e18
 
         // Combined: (1000 * btcUsdPrice * 10^ethDecimals * 1e18) / (1e8 * ethUsdPrice * 10^btcDecimals)
+        // forge-lint: disable-next-line(unsafe-typecast)
         uint256 numerator = uint256(MINT_COST_SATS) * uint256(btcUsdPrice) * (10 ** ethDecimals) * 1e18;
+        // forge-lint: disable-next-line(unsafe-typecast)
         uint256 denominator = 1e8 * uint256(ethUsdPrice) * (10 ** btcDecimals);
 
         return numerator / denominator;
@@ -72,7 +74,7 @@ contract OnebtcOnebtc is ERC721, ERC2981, Ownable {
         require(bytes(analogy).length > 0, "Empty analogy");
         require(bytes(analogy).length <= 1000, "Analogy too long");
 
-        uint256 price = getMintPriceInETH();
+        uint256 price = getMintPriceInEth();
         uint256 minPrice = (price * (10000 - TOLERANCE_BPS)) / 10000;
         require(msg.value >= minPrice, "Insufficient payment");
 
