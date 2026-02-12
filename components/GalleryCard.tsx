@@ -39,7 +39,7 @@ export function GalleryCard({ item, onUpvoteSuccess }: GalleryCardProps) {
         </div>
       </div>
       {showNft && (
-        <NftModal tokenId={item.tokenId} onClose={() => setShowNft(false)} />
+        <NftModal item={item} onUpvoteSuccess={onUpvoteSuccess} onClose={() => setShowNft(false)} />
       )}
     </>
   );
