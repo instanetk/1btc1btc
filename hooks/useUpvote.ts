@@ -32,14 +32,20 @@ export function useUpvote(tokenId: bigint, voterAddress?: `0x${string}`) {
     });
   };
 
-  // Refetch voted status after successful tx
+  // Refetch voted status and sync upvote to MongoDB after successful tx
   const prevSuccess = useRef(false);
   useEffect(() => {
     if (isSuccess && !prevSuccess.current) {
       prevSuccess.current = true;
       refetchVoted();
+      // Fire-and-forget: sync upvote count to MongoDB
+      fetch("/api/gallery/upvote", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ tokenId: Number(tokenId) }),
+      }).catch(() => {});
     }
-  }, [isSuccess, refetchVoted]);
+  }, [isSuccess, refetchVoted, tokenId]);
 
   return {
     upvote,
