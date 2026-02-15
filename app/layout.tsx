@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import { Inter } from "next/font/google";
 import { Providers } from "./providers";
 import "@coinbase/onchainkit/styles.css";
@@ -26,6 +27,14 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.variable}>
+        {process.env.NEXT_PUBLIC_PLAUSIBLE_HOST && (
+          <Script
+            defer
+            data-domain="1btc1btc.money"
+            src={`${process.env.NEXT_PUBLIC_PLAUSIBLE_HOST}/js/script.js`}
+            strategy="afterInteractive"
+          />
+        )}
         <Providers>{children}</Providers>
       </body>
     </html>

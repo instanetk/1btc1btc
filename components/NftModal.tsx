@@ -4,6 +4,7 @@ import { Identity, Name, Avatar } from "@coinbase/onchainkit/identity";
 import { base } from "wagmi/chains";
 import { contractConfig } from "@/lib/contract";
 import { CONTRACT_ADDRESS, CHAIN } from "@/lib/constants";
+import { trackEvent } from "@/lib/analytics";
 import { UpvoteButton } from "./UpvoteButton";
 import type { GalleryItem } from "@/hooks/useGallery";
 import styles from "./NftModal.module.css";
@@ -84,7 +85,7 @@ export function NftModal({ item, onUpvoteSuccess, onClose }: NftModalProps) {
               href={getOpenSeaUrl(item.tokenId)}
               target="_blank"
               rel="noopener noreferrer"
-              onClick={(e) => e.stopPropagation()}
+              onClick={(e) => { e.stopPropagation(); trackEvent("Buy Link", { tokenId: Number(item.tokenId) }); }}
             >
               Buy
             </a>
@@ -92,6 +93,7 @@ export function NftModal({ item, onUpvoteSuccess, onClose }: NftModalProps) {
               className={styles.shareButton}
               onClick={(e) => {
                 e.stopPropagation();
+                trackEvent("Share", { tokenId: Number(item.tokenId) });
                 const url = `${window.location.origin}/nft/${item.tokenId.toString()}`;
                 const text = `1 BTC = 1 BTC ₿`;
                 window.open(

@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect, useCallback } from "react";
+import { trackEvent } from "@/lib/analytics";
 import { GeneratedCard } from "./GeneratedCard";
 import styles from "./GeneratedGallery.module.css";
 
@@ -79,7 +80,7 @@ export function GeneratedGallery({ onConnect }: GeneratedGalleryProps) {
             <div className={styles.pagination}>
               <button
                 className={styles.pageButton}
-                onClick={() => setPage(page - 1)}
+                onClick={() => { trackEvent("Unminted Paginate", { page: page - 1 }); setPage(page - 1); }}
                 disabled={page === 0}
               >
                 &larr; Prev
@@ -89,7 +90,7 @@ export function GeneratedGallery({ onConnect }: GeneratedGalleryProps) {
               </span>
               <button
                 className={styles.pageButton}
-                onClick={() => setPage(page + 1)}
+                onClick={() => { trackEvent("Unminted Paginate", { page: page + 1 }); setPage(page + 1); }}
                 disabled={page >= totalPages - 1}
               >
                 Next &rarr;

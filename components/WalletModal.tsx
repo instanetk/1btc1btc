@@ -1,6 +1,7 @@
 "use client";
 import { useEffect } from "react";
 import { useConnect, useAccount } from "wagmi";
+import { trackEvent } from "@/lib/analytics";
 import styles from "./WalletModal.module.css";
 
 interface WalletModalProps {
@@ -43,7 +44,7 @@ export function WalletModal({ isOpen, onClose }: WalletModalProps) {
             <button
               key={connector.uid}
               className={styles.connector}
-              onClick={() => connect({ connector })}
+              onClick={() => { trackEvent("Wallet Connector", { connector: connector.name }); connect({ connector }); }}
               disabled={isPending}
             >
               {connector.icon && (

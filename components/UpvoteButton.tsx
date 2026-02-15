@@ -2,6 +2,7 @@
 import { useEffect, useRef } from "react";
 import { useAccount } from "wagmi";
 import { useUpvote } from "@/hooks/useUpvote";
+import { trackEvent } from "@/lib/analytics";
 import styles from "./UpvoteButton.module.css";
 
 interface UpvoteButtonProps {
@@ -27,7 +28,7 @@ export function UpvoteButton({ tokenId, currentUpvotes, onSuccess }: UpvoteButto
   return (
     <button
       className={`${styles.button} ${voted ? styles.voted : ""}`}
-      onClick={upvote}
+      onClick={() => { trackEvent("Upvote", { tokenId: Number(tokenId) }); upvote(); }}
       disabled={!isConnected || voted || isPending}
       title={!isConnected ? "Connect wallet to upvote" : voted ? "Already voted" : "Upvote"}
     >

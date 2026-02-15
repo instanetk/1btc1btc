@@ -1,5 +1,6 @@
 "use client";
 import { useGallery } from "@/hooks/useGallery";
+import { trackEvent } from "@/lib/analytics";
 import { GalleryCard } from "./GalleryCard";
 import { GallerySortToggle } from "./GallerySortToggle";
 import styles from "./Gallery.module.css";
@@ -37,7 +38,7 @@ export function Gallery() {
             <div className={styles.pagination}>
               <button
                 className={styles.pageButton}
-                onClick={() => setPage(page - 1)}
+                onClick={() => { trackEvent("Gallery Paginate", { page: page - 1 }); setPage(page - 1); }}
                 disabled={page === 0}
               >
                 &larr; Prev
@@ -47,7 +48,7 @@ export function Gallery() {
               </span>
               <button
                 className={styles.pageButton}
-                onClick={() => setPage(page + 1)}
+                onClick={() => { trackEvent("Gallery Paginate", { page: page + 1 }); setPage(page + 1); }}
                 disabled={page >= totalPages - 1}
               >
                 Next &rarr;

@@ -4,6 +4,7 @@ import { useAccount, useWriteContract, useWaitForTransactionReceipt } from "wagm
 import { decodeEventLog } from "viem";
 import { contractConfig, ONEBTC_ABI } from "@/lib/contract";
 import { useMintPrice } from "@/hooks/useMintPrice";
+import { trackEvent } from "@/lib/analytics";
 import styles from "./MintButton.module.css";
 
 interface MintButtonProps {
@@ -35,6 +36,7 @@ export function MintButton({ analogy, analogyId, onSuccess, onConnect, compact }
       return;
     }
     if (!priceInWei) return;
+    trackEvent("Mint Start");
     // Add 2% buffer to account for price movement
     const valueWithBuffer = (priceInWei * 102n) / 100n;
     writeContract({
@@ -75,6 +77,8 @@ export function MintButton({ analogy, analogyId, onSuccess, onConnect, compact }
           // Log parsing failed, continue without tokenId
         }
 
+        trackEvent("Mint Success", tokenId != null ? { tokenId } : undefined);
+
         fetch(`/api/analogies/${analogyId}/mint`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -89,6 +93,12 @@ export function MintButton({ analogy, analogyId, onSuccess, onConnect, compact }
       }
     }
   }, [isSuccess, txHash, onSuccess, analogyId, address, receipt]);
+
+  useEffect(() => {
+    if (writeError) {
+      trackEvent("Mint Fail");
+    }
+  }, [writeError]);
 
   const isPending = isWritePending || isConfirming;
 

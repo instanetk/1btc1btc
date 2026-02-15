@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { Identity, Name, Avatar } from "@coinbase/onchainkit/identity";
 import { base } from "wagmi/chains";
+import { trackEvent } from "@/lib/analytics";
 import { UpvoteButton } from "./UpvoteButton";
 import { NftModal } from "./NftModal";
 import type { GalleryItem } from "@/hooks/useGallery";
@@ -17,7 +18,7 @@ export function GalleryCard({ item, onUpvoteSuccess }: GalleryCardProps) {
 
   return (
     <>
-      <div className={styles.card} onClick={() => setShowNft(true)}>
+      <div className={styles.card} onClick={() => { trackEvent("NFT Modal Open", { tokenId: Number(item.tokenId) }); setShowNft(true); }}>
         <p className={styles.analogy}>{item.analogy}</p>
         <div className={styles.footer}>
           <div className={styles.identity}>
