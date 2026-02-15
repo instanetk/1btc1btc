@@ -20,6 +20,7 @@
 # foundry
 /contracts/out/
 /contracts/cache/
+/contracts/broadcast/
 
 # production
 /build
