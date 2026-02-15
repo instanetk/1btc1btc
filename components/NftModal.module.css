@@ -126,6 +126,25 @@
   color: var(--color-accent);
 }
 
+.shareButton {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 8px;
+  font-size: 0.75rem;
+  font-family: inherit;
+  color: #888;
+  background: transparent;
+  border: 1px solid #E5E5E5;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.shareButton:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }

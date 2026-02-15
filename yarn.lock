@@ -27,6 +27,7 @@ __metadata:
     next: 15.3.4
     react: ^19.0.0
     react-dom: ^19.0.0
+    sharp: ^0.34.5
     tsx: ^4.21.0
     typescript: ^5
     viem: ^2.31.6
@@ -9658,7 +9659,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"sharp@npm:^0.34.1":
+"sharp@npm:^0.34.1, sharp@npm:^0.34.5":
   version: 0.34.5
   resolution: "sharp@npm:0.34.5"
   dependencies:

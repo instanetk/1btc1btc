@@ -88,6 +88,21 @@ export function NftModal({ item, onUpvoteSuccess, onClose }: NftModalProps) {
             >
               Buy
             </a>
+            <button
+              className={styles.shareButton}
+              onClick={(e) => {
+                e.stopPropagation();
+                const url = `${window.location.origin}/nft/${item.tokenId.toString()}`;
+                const text = `1 BTC = 1 BTC ₿`;
+                window.open(
+                  `https://x.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`,
+                  "_blank",
+                  "noopener,noreferrer"
+                );
+              }}
+            >
+              Share
+            </button>
           </div>
         </div>
       </div>

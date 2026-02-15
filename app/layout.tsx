@@ -10,6 +10,9 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_SITE_URL ?? "https://1btc1btc.money"
+  ),
   title: "1BTC=1BTC.money",
   description:
     "Meditative philosophical analogies about 1 BTC = 1 BTC. Generate, reflect, and mint onchain.",
