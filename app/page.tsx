@@ -9,6 +9,7 @@ import { ConnectButton } from "@/components/ConnectButton";
 import { WalletModal } from "@/components/WalletModal";
 import { Gallery } from "@/components/Gallery";
 import { GeneratedGallery } from "@/components/GeneratedGallery";
+import { ProgressBar } from "@/components/ProgressBar";
 import styles from "./page.module.css";
 
 export default function Home() {
@@ -56,6 +57,7 @@ export default function Home() {
 
   return (
     <div className={styles.container}>
+      <ProgressBar />
       {/* Wallet connect — top right */}
       <header className={styles.header}>
         <ConnectButton onConnect={openWalletModal} />

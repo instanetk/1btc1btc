@@ -4,7 +4,7 @@
 
 .header {
   position: fixed;
-  top: 0;
+  top: 24px;
   right: 0;
   padding: 1rem;
   z-index: 100;

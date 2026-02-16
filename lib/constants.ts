@@ -19,3 +19,11 @@ export const MINT_COST_SATS = 10000;
 
 // Royalty basis points (25%)
 export const ROYALTY_BPS = 2500;
+
+// Progress bar constants
+export const SATS_PER_BTC = 100_000_000;
+export const PROGRESS_RANGES = [
+  { label: "0.01 BTC", mints: 100 },
+  { label: "0.1 BTC", mints: 1_000 },
+  { label: "1 BTC", mints: 10_000 },
+] as const;
