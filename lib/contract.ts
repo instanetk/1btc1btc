@@ -57,6 +57,13 @@ export const ONEBTC_ABI = [
   },
   {
     type: "function",
+    name: "MAX_SUPPLY",
+    inputs: [],
+    outputs: [{ name: "", type: "uint256", internalType: "uint256" }],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
     name: "tokenURI",
     inputs: [{ name: "tokenId", type: "uint256", internalType: "uint256" }],
     outputs: [{ name: "", type: "string", internalType: "string" }],

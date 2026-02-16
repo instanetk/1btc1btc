@@ -190,6 +190,22 @@ contract OnebtcOnebtcTest is Test {
         assertEq(royaltyAmount, 0.25 ether); // 25%
     }
 
+    function test_maxSupply() public view {
+        assertEq(nft.MAX_SUPPLY(), 10000);
+    }
+
+    function test_mint_failsAtMaxSupply() public {
+        // totalSupply is at storage slot 9 (after inherited ERC721/ERC2981/Ownable storage)
+        // Use vm.store to set totalSupply to MAX_SUPPLY
+        vm.store(address(nft), bytes32(uint256(9)), bytes32(uint256(10000)));
+        assertEq(nft.totalSupply(), 10000);
+
+        uint256 price = nft.getMintPriceInEth();
+        vm.prank(minter);
+        vm.expectRevert("Max supply reached");
+        nft.mint{value: price}("Should fail.");
+    }
+
     function test_multipleMints() public {
         uint256 price = nft.getMintPriceInEth();
 

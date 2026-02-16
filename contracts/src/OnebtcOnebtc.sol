@@ -24,6 +24,7 @@ contract OnebtcOnebtc is ERC721, ERC2981, Ownable, ReentrancyGuard {
     uint256 public constant MINT_COST_SATS = 10000;
     uint256 public constant TOLERANCE_BPS = 100; // 1% tolerance
     uint256 public constant ORACLE_STALENESS = 3600; // 1 hour
+    uint256 public constant MAX_SUPPLY = 10000;
 
     AggregatorV3Interface public immutable BTC_USD_FEED;
     AggregatorV3Interface public immutable ETH_USD_FEED;
@@ -77,6 +78,7 @@ contract OnebtcOnebtc is ERC721, ERC2981, Ownable, ReentrancyGuard {
     function mint(string calldata analogy) external payable nonReentrant {
         require(bytes(analogy).length > 0, "Empty analogy");
         require(bytes(analogy).length <= 1000, "Analogy too long");
+        require(totalSupply < MAX_SUPPLY, "Max supply reached");
 
         uint256 price = getMintPriceInEth();
         uint256 minPrice = (price * (10000 - TOLERANCE_BPS)) / 10000;
