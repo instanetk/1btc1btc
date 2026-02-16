@@ -63,10 +63,49 @@
   min-width: 0;
 }
 
+/* 1 BTC milestone celebration */
+.milestone {
+  background: rgba(10, 10, 10, 0.95);
+  border-bottom: 1px solid rgba(247, 147, 26, 0.3);
+}
+
+.milestoneIcon {
+  color: var(--color-accent);
+  font-size: 0.75rem;
+}
+
+.milestoneLabel {
+  color: var(--color-accent);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  animation: milestonePulse 3s ease-in-out infinite;
+}
+
+.fillMilestone {
+  background: linear-gradient(90deg, var(--color-accent), #ffd700, var(--color-accent));
+  background-size: 200% 100%;
+  animation: shimmer 3s ease-in-out infinite;
+  box-shadow: 0 0 12px rgba(247, 147, 26, 0.6);
+}
+
+@keyframes shimmer {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+@keyframes milestonePulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
 @media (max-width: 480px) {
   .rangeIndicator {
     position: static;
     transform: none;
     margin-left: 8px;
+  }
+
+  .milestoneLabel {
+    display: none;
   }
 }

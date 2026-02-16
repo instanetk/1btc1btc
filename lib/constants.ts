@@ -27,3 +27,6 @@ export const PROGRESS_RANGES = [
   { label: "0.1 BTC", mints: 1_000 },
   { label: "1 BTC", mints: 10_000 },
 ] as const;
+
+// The 1 BTC milestone — 10,000 mints
+export const ONE_BTC_MILESTONE = 10_000;

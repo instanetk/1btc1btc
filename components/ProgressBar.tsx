@@ -1,7 +1,7 @@
 "use client";
 import { useState, useCallback, useEffect } from "react";
 import { useTotalSupply } from "@/hooks/useTotalSupply";
-import { PROGRESS_RANGES, MINT_COST_SATS, SATS_PER_BTC } from "@/lib/constants";
+import { PROGRESS_RANGES, MINT_COST_SATS, SATS_PER_BTC, ONE_BTC_MILESTONE } from "@/lib/constants";
 import { trackEvent } from "@/lib/analytics";
 import styles from "./ProgressBar.module.css";
 
@@ -47,10 +47,11 @@ export function ProgressBar() {
   const supply = totalSupply ?? 0;
   const pct = Math.min((supply / range.mints) * 100, 100);
   const btcEarned = (supply * MINT_COST_SATS) / SATS_PER_BTC;
+  const milestoneReached = supply >= ONE_BTC_MILESTONE;
 
   return (
     <div
-      className={styles.bar}
+      className={`${styles.bar} ${milestoneReached ? styles.milestone : ""}`}
       role="button"
       tabIndex={0}
       onClick={cycleRange}
@@ -60,10 +61,14 @@ export function ProgressBar() {
       <div className={styles.inner}>
         {totalSupply != null ? (
           <span className={styles.label}>
+            {milestoneReached && <span className={styles.milestoneIcon}>&#x20bf; </span>}
             <span className={styles.accent}>{supply.toLocaleString()}</span>
             <span className={styles.muted}> / {range.mints.toLocaleString()} mints · </span>
             <span className={styles.accent}>{btcEarned.toFixed(4)}</span>
             <span className={styles.muted}> / {range.label}</span>
+            {milestoneReached && (
+              <span className={styles.milestoneLabel}> · 1 BTC REACHED</span>
+            )}
           </span>
         ) : (
           <span className={`${styles.label} ${styles.muted}`}>-- / -- mints</span>
@@ -73,7 +78,7 @@ export function ProgressBar() {
         </span>
       </div>
       <div className={styles.track}>
-        <div className={styles.fill} style={{ width: `${pct}%` }} />
+        <div className={`${styles.fill} ${milestoneReached ? styles.fillMilestone : ""}`} style={{ width: `${pct}%` }} />
       </div>
     </div>
   );
