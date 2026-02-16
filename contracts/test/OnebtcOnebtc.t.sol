@@ -55,11 +55,11 @@ contract OnebtcOnebtcTest is Test {
 
     function test_getMintPriceInEth() public view {
         uint256 price = nft.getMintPriceInEth();
-        // 1000 sats = 1000/1e8 BTC = 0.00001 BTC
-        // 0.00001 BTC * $100,000 = $1.00
-        // $1.00 / $3,000 = 0.000333... ETH
-        // = 333333333333333 wei (approx)
-        assertApproxEqRel(price, 333333333333333, 0.01e18); // 1% tolerance
+        // 10000 sats = 10000/1e8 BTC = 0.0001 BTC
+        // 0.0001 BTC * $100,000 = $10.00
+        // $10.00 / $3,000 = 0.00333... ETH
+        // = 3333333333333333 wei (approx)
+        assertApproxEqRel(price, 3333333333333333, 0.01e18); // 1% tolerance
     }
 
     function test_mint() public {

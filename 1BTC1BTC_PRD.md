@@ -2,7 +2,7 @@
 
 ## Vision
 
-A meditative, single-page web app that generates ephemeral philosophical analogies about the concept **1 BTC = 1 BTC** — the idea that Bitcoin should be understood as its own unit of account, not through the lens of fiat conversion. Each analogy is fleeting unless the user chooses to immortalize it onchain as an NFT for 1,000 SATS.
+A meditative, single-page web app that generates ephemeral philosophical analogies about the concept **1 BTC = 1 BTC** — the idea that Bitcoin should be understood as its own unit of account, not through the lens of fiat conversion. Each analogy is fleeting unless the user chooses to immortalize it onchain as an NFT for 10,000 SATS.
 
 ---
 
@@ -16,7 +16,7 @@ A meditative, single-page web app that generates ephemeral philosophical analogi
 2. **Gallery** — A masonry or vertical card layout of minted analogies. Each card shows the analogy text, mint # (token ID), minter's ENS/address (via OnchainKit `<Identity>`), and an **upvote count** with a vote button. Sorted by upvotes (descending) by default, with an option to sort by "newest." Upvoting requires a connected wallet (one vote per wallet per NFT, stored onchain).
 3. **Generate** — An LLM produces a brief (2–4 sentence) analogy or philosophical description of "1 BTC = 1 BTC." The text appears with a subtle fade-in animation in the hero section.
 4. **Ephemeral by default** — The generated text is not stored anywhere. If the user navigates away or generates a new one, it's gone forever. A gentle visual cue (e.g., a slow dissolve timer or sand-falling motif) reinforces impermanence.
-5. **Mint** — If the user connects their wallet and clicks "Mint this thought," the analogy is minted as an onchain NFT. Cost: **1,000 SATS** (dynamically priced via Chainlink oracle). The contract enforces a **25% resale royalty** (ERC-2981). After minting, the new NFT appears at the top of the Gallery in the "newest" sort.
+5. **Mint** — If the user connects their wallet and clicks "Mint this thought," the analogy is minted as an onchain NFT. Cost: **10,000 SATS** (dynamically priced via Chainlink oracle). The contract enforces a **25% resale royalty** (ERC-2981). After minting, the new NFT appears at the top of the Gallery in the "newest" sort.
 6. **Upvote** — Connected wallets can upvote any minted analogy (one vote per wallet per token). Upvotes are stored onchain in the contract for permanence and verifiability. The Gallery re-sorts in real time.
 
 ---
@@ -43,7 +43,7 @@ A meditative, single-page web app that generates ephemeral philosophical analogi
 ```
 - name: "1BTC=1BTC"
 - symbol: "ONEBTC"
-- MINT_COST_SATS: 1000 (constant)
+- MINT_COST_SATS: 10000 (constant)
 - royaltyBps: 2500 (25%)
 - royaltyRecipient: deployer / treasury address
 - priceFeed: Chainlink AggregatorV3Interface (BTC/ETH on Base)
@@ -55,10 +55,10 @@ Storage:
 - uint256 public totalSupply;                            // auto-incrementing token ID
 
 Functions:
-- getMintPriceInETH() → view, returns current ETH cost of 1000 SATS
+- getMintPriceInETH() → view, returns current ETH cost of 10000 SATS
 - mint(string calldata analogy) → payable, public
   - Reads Chainlink oracle for BTC/ETH price
-  - Calculates ETH equivalent of 1000 SATS
+  - Calculates ETH equivalent of 10000 SATS
   - Requires msg.value >= calculated price (with 1% tolerance)
   - Stores analogy text in mapping
   - Mints ERC-721 token
@@ -157,7 +157,7 @@ CDS COMPONENT MAPPING:
   all structural layout. No raw divs unless necessary.
 - Buttons:
   - "Generate": <Button variant="secondary"> (ghost-like appearance)
-  - "Mint this thought · 1000 SATS": <Button variant="positive"> 
+  - "Mint this thought · 10K SATS": <Button variant="positive"> 
     styled with Bitcoin orange background. Wraps OnchainKit 
     <Transaction> internally.
   - Upvote: <IconButton> with a custom arrow-up icon
@@ -181,7 +181,7 @@ HERO SECTION (100vh, vertically centered using VStack):
    Placeholder when empty: "A thought awaits." in foregroundSecondary
 3. Button row: <HStack gap={2}> containing:
    - <Button variant="secondary">Generate</Button>
-   - <Button variant="positive">Mint this thought · 1000 SATS</Button>
+   - <Button variant="positive">Mint this thought · 10K SATS</Button>
      (only visible after generation)
 4. Wallet: OnchainKit <ConnectWallet> positioned top-right via 
    absolute positioning in a <Box>
@@ -414,11 +414,11 @@ NEXT_PUBLIC_CHAIN_ID=8453                # Base mainnet
 ## Resolved Decisions
 
 ### 1. Payment denomination → Chainlink Oracle
-Use a **Chainlink BTC/ETH price feed on Base** to dynamically calculate the ETH equivalent of 1,000 SATS at mint time. The contract reads the oracle, computes the price, and validates `msg.value` meets or exceeds it. This keeps the "1000 SATS" promise honest regardless of market movement.
+Use a **Chainlink BTC/ETH price feed on Base** to dynamically calculate the ETH equivalent of 10,000 SATS at mint time. The contract reads the oracle, computes the price, and validates `msg.value` meets or exceeds it. This keeps the "10K SATS" promise honest regardless of market movement.
 
 **Implementation notes:**
 - Chainlink BTC/ETH feed on Base: `0x64c911996D3c6aC71f9b455B1E8E7266BcbD848F` (verify at deploy time)
-- Contract calculates: `mintPrice = (1000 * 1e18) / (btcEthPrice * 1e8)` (adjusted for decimals)
+- Contract calculates: `mintPrice = (10000 * 1e18) / (btcEthPrice * 1e8)` (adjusted for decimals)
 - Include a small tolerance buffer (~1%) for price movement between UI display and tx confirmation
 - Add a `maxMintPrice` failsafe so users aren't overcharged if the oracle malfunctions
 - The UI should display the current ETH cost dynamically, refreshing every ~30 seconds

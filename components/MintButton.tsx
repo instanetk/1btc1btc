@@ -114,8 +114,8 @@ export function MintButton({ analogy, analogyId, onSuccess, onConnect, compact }
           : isPending
             ? "Minting..."
             : compact
-              ? "Mint \u00b7 1000 SATS"
-              : "Mint this thought \u00b7 1000 SATS"}
+              ? "Mint \u00b7 10K SATS"
+              : "Mint this thought \u00b7 10K SATS"}
       </button>
       {writeError && (
         <p className={styles.error}>

@@ -1,6 +1,6 @@
 # 1BTC=1BTC.money
 
-A meditative web app that generates philosophical analogies about **1 BTC = 1 BTC** — the idea that Bitcoin should be understood as its own unit of account, not through the lens of fiat conversion. Each analogy is ephemeral unless you choose to immortalize it on-chain as an NFT for 1,000 sats.
+A meditative web app that generates philosophical analogies about **1 BTC = 1 BTC** — the idea that Bitcoin should be understood as its own unit of account, not through the lens of fiat conversion. Each analogy is ephemeral unless you choose to immortalize it on-chain as an NFT for 10,000 sats.
 
 > *A river doesn't ask how many buckets it equals. It simply flows — complete, indivisible, and certain of its own depth. One bitcoin knows what it is.*
 
@@ -10,7 +10,7 @@ Built with Next.js 15, Coinbase OnchainKit, wagmi/viem, and Anthropic Claude. De
 
 1. **Generate** — Claude produces a brief philosophical analogy drawn from 99 thematic domains (nature, physics, mathematics, philosophy, human experience)
 2. **Reflect** — The text is ephemeral by default. Browse minted and unminted thoughts in the gallery
-3. **Mint** — Immortalize a thought as a fully on-chain SVG NFT for 1,000 sats (dynamically priced via Chainlink oracles)
+3. **Mint** — Immortalize a thought as a fully on-chain SVG NFT for 10,000 sats (dynamically priced via Chainlink oracles)
 4. **Upvote** — One vote per wallet per token, stored on-chain. Gallery sorts by top or newest
 5. **Collect** — Share to X, trade on OpenSea
 
@@ -80,7 +80,7 @@ forge script script/Deploy.s.sol --rpc-url <RPC> --broadcast --verify  # Deploy
 
 `OnebtcOnebtc.sol` — ERC-721 with fully on-chain SVG metadata. Analogy text is stored in contract storage and rendered as a self-contained SVG — no IPFS, no external dependencies.
 
-- **Dynamic pricing** — 1,000 sats converted to ETH via Chainlink cbBTC/USD and ETH/USD feeds
+- **Dynamic pricing** — 10,000 sats converted to ETH via Chainlink cbBTC/USD and ETH/USD feeds
 - **On-chain art** — SVG with logo, analogy text, and 4 randomized orbital ellipses (seeded by `keccak256(tokenId)`)
 - **Upvoting** — One vote per wallet per token, stored on-chain
 - **Royalties** — 25% ERC-2981 on secondary sales

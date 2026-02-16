@@ -21,7 +21,7 @@ contract OnebtcOnebtc is ERC721, ERC2981, Ownable, ReentrancyGuard {
     using Strings for uint256;
     using Strings for address;
 
-    uint256 public constant MINT_COST_SATS = 1000;
+    uint256 public constant MINT_COST_SATS = 10000;
     uint256 public constant TOLERANCE_BPS = 100; // 1% tolerance
     uint256 public constant ORACLE_STALENESS = 3600; // 1 hour
 
@@ -47,7 +47,7 @@ contract OnebtcOnebtc is ERC721, ERC2981, Ownable, ReentrancyGuard {
         _setDefaultRoyalty(_royaltyRecipient, 2500); // 25%
     }
 
-    /// @notice Returns the current mint price in wei (ETH equivalent of 1000 SATS)
+    /// @notice Returns the current mint price in wei (ETH equivalent of 10000 SATS)
     function getMintPriceInEth() public view returns (uint256) {
         (, int256 btcUsdPrice,, uint256 btcUpdatedAt,) = BTC_USD_FEED.latestRoundData();
         (, int256 ethUsdPrice,, uint256 ethUpdatedAt,) = ETH_USD_FEED.latestRoundData();
@@ -59,12 +59,12 @@ contract OnebtcOnebtc is ERC721, ERC2981, Ownable, ReentrancyGuard {
         uint8 btcDecimals = BTC_USD_FEED.decimals();
         uint8 ethDecimals = ETH_USD_FEED.decimals();
 
-        // 1000 sats = 1000 / 1e8 BTC
-        // Value in USD = (1000 / 1e8) * btcUsdPrice / 10^btcDecimals
+        // 10000 sats = 10000 / 1e8 BTC
+        // Value in USD = (10000 / 1e8) * btcUsdPrice / 10^btcDecimals
         // Value in ETH = valueInUSD / (ethUsdPrice / 10^ethDecimals)
         // Value in wei = valueInETH * 1e18
 
-        // Combined: (1000 * btcUsdPrice * 10^ethDecimals * 1e18) / (1e8 * ethUsdPrice * 10^btcDecimals)
+        // Combined: (10000 * btcUsdPrice * 10^ethDecimals * 1e18) / (1e8 * ethUsdPrice * 10^btcDecimals)
         // forge-lint: disable-next-line(unsafe-typecast)
         uint256 numerator = uint256(MINT_COST_SATS) * uint256(btcUsdPrice) * (10 ** ethDecimals) * 1e18;
         // forge-lint: disable-next-line(unsafe-typecast)

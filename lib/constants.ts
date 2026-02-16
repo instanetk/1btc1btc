@@ -15,7 +15,7 @@ export const CHAINLINK_CBBTC_USD_FEED =
   "0x07DA0E54543a844a80ABE69c8A12F22B3aA59f9D" as const;
 
 // Mint cost in satoshis
-export const MINT_COST_SATS = 1000;
+export const MINT_COST_SATS = 10000;
 
 // Royalty basis points (25%)
 export const ROYALTY_BPS = 2500;

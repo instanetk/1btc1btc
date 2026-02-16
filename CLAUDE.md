@@ -69,7 +69,7 @@ ERC721 with fully on-chain SVG metadata. Key functions:
 |---|---|
 | `mint(string analogy)` | Payable. Dynamic price via Chainlink oracles. Reentrancy guard, oracle staleness check (1hr), input validation (1-1000 chars). Refunds excess. |
 | `upvote(uint256 tokenId)` | One vote per wallet per token. |
-| `getMintPriceInEth()` | Converts 1000 sats → USD → ETH using Chainlink BTC/USD and ETH/USD feeds. |
+| `getMintPriceInEth()` | Converts 10,000 sats → USD → ETH using Chainlink BTC/USD and ETH/USD feeds. |
 | `tokenURI(uint256 tokenId)` | Returns base64 JSON data URI with embedded base64 SVG. SVG includes logo, analogy text, 4 randomized orbital ellipses (seeded by `keccak256(tokenId)`), token number, branding. |
 | `withdraw()` | Owner-only ETH withdrawal. |
 
