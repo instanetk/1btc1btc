@@ -220,4 +220,71 @@ contract OnebtcOnebtcTest is Test {
         assertEq(nft.ownerOf(1), minter);
         assertEq(nft.ownerOf(2), minter);
     }
+
+    function test_tokenURI_shortText() public {
+        uint256 price = nft.getMintPriceInEth();
+        vm.prank(minter);
+        nft.mint{value: price}("X");
+
+        string memory uri = nft.tokenURI(0);
+        bytes memory prefix = bytes("data:application/json;base64,");
+        for (uint i = 0; i < prefix.length; i++) {
+            assertEq(bytes(uri)[i], prefix[i]);
+        }
+    }
+
+    function test_tokenURI_longText() public {
+        uint256 price = nft.getMintPriceInEth();
+
+        // Build 999-char string with spaces every 10 chars
+        bytes memory text = new bytes(999);
+        for (uint256 i = 0; i < 999; i++) {
+            if (i > 0 && i % 10 == 0) {
+                text[i] = " ";
+            } else {
+                text[i] = "a";
+            }
+        }
+
+        vm.prank(minter);
+        nft.mint{value: price}(string(text));
+
+        string memory uri = nft.tokenURI(0);
+        bytes memory prefix = bytes("data:application/json;base64,");
+        for (uint i = 0; i < prefix.length; i++) {
+            assertEq(bytes(uri)[i], prefix[i]);
+        }
+    }
+
+    function test_tokenURI_noSpaces() public {
+        uint256 price = nft.getMintPriceInEth();
+
+        // Build 100-char string with no spaces (forces line breaks)
+        bytes memory text = new bytes(100);
+        for (uint256 i = 0; i < 100; i++) {
+            text[i] = "x";
+        }
+
+        vm.prank(minter);
+        nft.mint{value: price}(string(text));
+
+        string memory uri = nft.tokenURI(0);
+        bytes memory prefix = bytes("data:application/json;base64,");
+        for (uint i = 0; i < prefix.length; i++) {
+            assertEq(bytes(uri)[i], prefix[i]);
+        }
+    }
+
+    function test_tokenURI_xmlEntities() public {
+        uint256 price = nft.getMintPriceInEth();
+
+        vm.prank(minter);
+        nft.mint{value: price}('Testing & escaping < > " characters.');
+
+        string memory uri = nft.tokenURI(0);
+        bytes memory prefix = bytes("data:application/json;base64,");
+        for (uint i = 0; i < prefix.length; i++) {
+            assertEq(bytes(uri)[i], prefix[i]);
+        }
+    }
 }
