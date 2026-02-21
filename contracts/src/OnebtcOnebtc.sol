@@ -37,6 +37,7 @@ contract OnebtcOnebtc is ERC721, ERC2981, Ownable, ReentrancyGuard {
 
     event AnalogyMinted(uint256 indexed tokenId, address indexed minter, string analogy);
     event Upvoted(uint256 indexed tokenId, address indexed voter);
+    event Withdrawn(address indexed to, uint256 amount);
 
     constructor(
         address _btcUsdFeed,
@@ -413,6 +414,7 @@ contract OnebtcOnebtc is ERC721, ERC2981, Ownable, ReentrancyGuard {
         require(balance > 0, "No balance");
         (bool success,) = owner().call{value: balance}("");
         require(success, "Withdraw failed");
+        emit Withdrawn(owner(), balance);
     }
 
     /// @dev Required override for ERC721 + ERC2981

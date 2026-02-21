@@ -162,6 +162,9 @@ contract OnebtcOnebtcTest is Test {
         uint256 contractBalance = address(nft).balance;
         uint256 ownerBalanceBefore = owner.balance;
 
+        vm.expectEmit(true, false, false, true);
+        emit OnebtcOnebtc.Withdrawn(owner, contractBalance);
+
         vm.prank(owner);
         nft.withdraw();
 
