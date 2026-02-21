@@ -63,15 +63,16 @@ layout.tsx (Server Component — metadata, fonts, global CSS)
 
 ## Contract (`contracts/src/OnebtcOnebtc.sol`)
 
-ERC721 with fully on-chain SVG metadata. Key functions:
+ERC721 with fully on-chain SVG metadata. Inherits Ownable2Step (two-step ownership transfer), Pausable, and ReentrancyGuard. Key functions:
 
 | Function | Description |
 |---|---|
-| `mint(string analogy)` | Payable. Dynamic price via Chainlink oracles. Reentrancy guard, oracle staleness check (1hr), input validation (1-1000 chars). Refunds excess. |
+| `mint(string analogy)` | Payable. Dynamic price via Chainlink oracles. Pausable, reentrancy guard, oracle staleness check (1hr), input validation (1-1000 chars). Refunds excess. |
 | `upvote(uint256 tokenId)` | One vote per wallet per token. |
-| `getMintPriceInEth()` | Converts 10,000 sats → USD → ETH using Chainlink BTC/USD and ETH/USD feeds. |
+| `getMintPriceInEth()` | Converts 10,000 sats → USD → ETH using Chainlink BTC/USD and ETH/USD feeds. Enforces price bounds (0.001–1 ETH) to guard against oracle malfunction. |
 | `tokenURI(uint256 tokenId)` | Returns base64 JSON data URI with embedded base64 SVG. SVG includes logo, analogy text, 4 randomized orbital ellipses (seeded by `keccak256(tokenId)`), token number, branding. |
-| `withdraw()` | Owner-only ETH withdrawal. |
+| `withdraw()` | Owner-only ETH withdrawal. Emits `Withdrawn` event. |
+| `pause()` / `unpause()` | Owner-only emergency controls to halt/resume minting. |
 
 Events: `AnalogyMinted(uint256 indexed tokenId, address indexed minter, string analogy)`, `Upvoted(uint256 indexed tokenId, address indexed voter)`, `Withdrawn(address indexed to, uint256 amount)`.
 

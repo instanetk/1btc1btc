@@ -1,6 +1,6 @@
 # 1BTC1BTC.money — Terms of Service
 
-*Last updated: February 17, 2026*
+*Last updated: February 20, 2026*
 
 By accessing 1BTC1BTC.money (the "Site") or interacting with the OnebtcOnebtc smart contract on Base (the "Contract"), you agree to these Terms of Service ("Terms"). If you do not agree, do not use the Site or mint any tokens.
 
@@ -47,9 +47,9 @@ You are free to sell or transfer your token on any compatible marketplace or dir
 
 By using the Site and minting tokens, you acknowledge and accept the following risks:
 
-**Smart contract risk.** The Contract has been developed with care, including reentrancy guards and input validation, but it has not been formally audited by a third-party security firm. Smart contracts may contain bugs or vulnerabilities that could result in loss of funds or tokens.
+**Smart contract risk.** The Contract has been developed with care, including reentrancy guards, input validation, two-step ownership transfers (Ownable2Step), and an owner-controlled pause mechanism for emergencies, but it has not been formally audited by a third-party security firm. Smart contracts may contain bugs or vulnerabilities that could result in loss of funds or tokens. The owner may pause minting at any time to respond to a discovered vulnerability; pausing does not affect existing tokens.
 
-**Oracle risk.** Mint pricing depends on Chainlink price feeds. The Contract includes a 1-hour staleness check, but price feeds may become temporarily unavailable, inaccurate, or manipulated in ways that affect the mint price.
+**Oracle risk.** Mint pricing depends on Chainlink price feeds. The Contract includes a 1-hour staleness check and enforces price bounds (0.001–1 ETH) to protect against oracle malfunction, but price feeds may become temporarily unavailable, inaccurate, or manipulated in ways that affect the mint price.
 
 **Blockchain risk.** Transactions on Base (and Ethereum L1) are irreversible. You are solely responsible for the security of your wallet, private keys, and seed phrases. Lost keys cannot be recovered, and stolen tokens cannot be returned.
 
