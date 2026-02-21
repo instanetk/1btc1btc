@@ -1,8 +1,9 @@
 # Stage 1: Install dependencies
 FROM node:20-alpine AS deps
+RUN corepack enable
 WORKDIR /app
 COPY package.json yarn.lock .yarnrc.yml ./
-RUN yarn install --frozen-lockfile
+RUN yarn install --immutable
 
 # Stage 2: Build the application
 FROM node:20-alpine AS builder

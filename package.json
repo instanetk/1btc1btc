@@ -2,6 +2,7 @@
   "name": "1btc1btc",
   "version": "0.1.0",
   "private": true,
+  "packageManager": "yarn@3.4.1",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
