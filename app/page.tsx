@@ -20,9 +20,12 @@ export default function Home() {
   const [generateError, setGenerateError] = useState<string | null>(null);
   const [mintSuccess, setMintSuccess] = useState<string | null>(null);
   const [walletModalOpen, setWalletModalOpen] = useState(false);
+  const [infoSidebarOpen, setInfoSidebarOpen] = useState(false);
 
   const openWalletModal = useCallback(() => setWalletModalOpen(true), []);
   const closeWalletModal = useCallback(() => setWalletModalOpen(false), []);
+  const openInfoSidebar = useCallback(() => setInfoSidebarOpen(true), []);
+  const closeInfoSidebar = useCallback(() => setInfoSidebarOpen(false), []);
 
   const handleGenerate = useCallback(async () => {
     setIsGenerating(true);
@@ -59,7 +62,7 @@ export default function Home() {
   return (
     <div className={styles.container}>
       <ProgressBar />
-      <InfoSidebar />
+      <InfoSidebar externalOpen={infoSidebarOpen} onExternalClose={closeInfoSidebar} />
       {/* Wallet connect — top right */}
       <header className={styles.header}>
         <ConnectButton onConnect={openWalletModal} />
@@ -95,6 +98,7 @@ export default function Home() {
                 analogyId={analogyId}
                 onSuccess={handleMintSuccess}
                 onConnect={openWalletModal}
+                onOpenTerms={openInfoSidebar}
               />
             )}
           </div>

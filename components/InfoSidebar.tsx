@@ -97,11 +97,24 @@ function renderMarkdown(md: string) {
   return elements;
 }
 
-export function InfoSidebar() {
+interface InfoSidebarProps {
+  externalOpen?: boolean;
+  onExternalClose?: () => void;
+}
+
+export function InfoSidebar({ externalOpen, onExternalClose }: InfoSidebarProps = {}) {
   const [isOpen, setIsOpen] = useState(false);
 
   const open = useCallback(() => setIsOpen(true), []);
-  const close = useCallback(() => setIsOpen(false), []);
+  const close = useCallback(() => {
+    setIsOpen(false);
+    onExternalClose?.();
+  }, [onExternalClose]);
+
+  // Allow parent to open the sidebar
+  useEffect(() => {
+    if (externalOpen) setIsOpen(true);
+  }, [externalOpen]);
 
   // Close on Escape
   useEffect(() => {

@@ -12,10 +12,11 @@ interface MintButtonProps {
   analogyId?: string | null;
   onSuccess?: (txHash: string) => void;
   onConnect?: () => void;
+  onOpenTerms?: () => void;
   compact?: boolean;
 }
 
-export function MintButton({ analogy, analogyId, onSuccess, onConnect, compact }: MintButtonProps) {
+export function MintButton({ analogy, analogyId, onSuccess, onConnect, onOpenTerms, compact }: MintButtonProps) {
   const { address, isConnected } = useAccount();
   const { priceInWei } = useMintPrice();
 
@@ -117,6 +118,14 @@ export function MintButton({ analogy, analogyId, onSuccess, onConnect, compact }
               ? "Mint \u00b7 10K SATS"
               : "Mint this thought \u00b7 10K SATS"}
       </button>
+      {!isSuccess && !compact && (
+        <p className={styles.terms}>
+          By minting, you agree to the{" "}
+          <button className={styles.termsLink} onClick={onOpenTerms}>
+            Terms of Service
+          </button>
+        </p>
+      )}
       {writeError && (
         <p className={styles.error}>
           {writeError.message.includes("User rejected")
