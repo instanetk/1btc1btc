@@ -43,6 +43,9 @@ contract OnebtcOnebtc is ERC721, ERC2981, Ownable, ReentrancyGuard {
         address _ethUsdFeed,
         address _royaltyRecipient
     ) ERC721("1BTC1BTC", "ONEBTC") Ownable(msg.sender) {
+        require(_btcUsdFeed != address(0), "Invalid BTC feed");
+        require(_ethUsdFeed != address(0), "Invalid ETH feed");
+        require(_royaltyRecipient != address(0), "Invalid royalty recipient");
         BTC_USD_FEED = AggregatorV3Interface(_btcUsdFeed);
         ETH_USD_FEED = AggregatorV3Interface(_ethUsdFeed);
         _setDefaultRoyalty(_royaltyRecipient, 2500); // 25%

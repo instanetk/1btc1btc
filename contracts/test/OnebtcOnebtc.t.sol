@@ -325,4 +325,19 @@ contract OnebtcOnebtcTest is Test {
             assertTrue(ch >= 0x20 || ch == 0, "Raw control character found in JSON");
         }
     }
+
+    function test_constructor_rejectsZeroBtcFeed() public {
+        vm.expectRevert("Invalid BTC feed");
+        new OnebtcOnebtc(address(0), address(ethFeed), owner);
+    }
+
+    function test_constructor_rejectsZeroEthFeed() public {
+        vm.expectRevert("Invalid ETH feed");
+        new OnebtcOnebtc(address(btcFeed), address(0), owner);
+    }
+
+    function test_constructor_rejectsZeroRoyaltyRecipient() public {
+        vm.expectRevert("Invalid royalty recipient");
+        new OnebtcOnebtc(address(btcFeed), address(ethFeed), address(0));
+    }
 }
