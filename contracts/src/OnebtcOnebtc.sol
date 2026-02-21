@@ -374,21 +374,31 @@ contract OnebtcOnebtc is ERC721, ERC2981, Ownable, ReentrancyGuard {
         return string(escaped);
     }
 
-    /// @dev Escapes special characters for safe JSON string embedding
+    /// @dev Escapes special characters for safe JSON string embedding (RFC 8259)
     function _escapeJson(string memory input) private pure returns (string memory) {
         bytes memory b = bytes(input);
         uint256 extra = 0;
         for (uint256 i = 0; i < b.length; i++) {
             bytes1 c = b[i];
-            if (c == '"' || c == "\\") extra += 1; // " → \" (+1), \ → \\ (+1)
+            if (c == '"' || c == "\\") extra += 1;        // " → \" (+1), \ → \\ (+1)
+            else if (uint8(c) < 0x20) extra += 5;         // control char → \u00XX (+5)
         }
         if (extra == 0) return input;
         bytes memory escaped = new bytes(b.length + extra);
         uint256 j = 0;
+        bytes16 hexChars = "0123456789abcdef";
         for (uint256 i = 0; i < b.length; i++) {
             bytes1 c = b[i];
             if (c == '"') { escaped[j++] = "\\"; escaped[j++] = '"'; }
             else if (c == "\\") { escaped[j++] = "\\"; escaped[j++] = "\\"; }
+            else if (uint8(c) < 0x20) {
+                escaped[j++] = "\\";
+                escaped[j++] = "u";
+                escaped[j++] = "0";
+                escaped[j++] = "0";
+                escaped[j++] = hexChars[uint8(c) >> 4];
+                escaped[j++] = hexChars[uint8(c) & 0x0F];
+            }
             else { escaped[j++] = c; }
         }
         return string(escaped);

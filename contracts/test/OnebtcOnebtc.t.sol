@@ -3,6 +3,7 @@ pragma solidity ^0.8.24;
 
 import {Test} from "forge-std/Test.sol";
 import {OnebtcOnebtc} from "../src/OnebtcOnebtc.sol";
+import {Base64} from "@openzeppelin/contracts/utils/Base64.sol";
 
 // Mock Chainlink aggregator
 contract MockAggregator {
@@ -285,6 +286,43 @@ contract OnebtcOnebtcTest is Test {
         bytes memory prefix = bytes("data:application/json;base64,");
         for (uint i = 0; i < prefix.length; i++) {
             assertEq(bytes(uri)[i], prefix[i]);
+        }
+    }
+
+    function test_tokenURI_controlCharacters() public {
+        uint256 price = nft.getMintPriceInEth();
+
+        // Build analogy with control characters: tab (0x09), newline (0x0A), null (0x00)
+        bytes memory text = new bytes(20);
+        text[0] = "H"; text[1] = "e"; text[2] = "l"; text[3] = "l"; text[4] = "o";
+        text[5] = 0x09; // tab
+        text[6] = 0x0A; // newline
+        text[7] = 0x00; // null
+        text[8] = "w"; text[9] = "o"; text[10] = "r"; text[11] = "l"; text[12] = "d";
+        for (uint256 i = 13; i < 20; i++) text[i] = " ";
+
+        vm.prank(minter);
+        nft.mint{value: price}(string(text));
+
+        string memory uri = nft.tokenURI(0);
+
+        // Verify valid data URI prefix
+        bytes memory prefix = bytes("data:application/json;base64,");
+        for (uint i = 0; i < prefix.length; i++) {
+            assertEq(bytes(uri)[i], prefix[i]);
+        }
+
+        // Decode base64 JSON and verify no raw control characters remain
+        bytes memory jsonBase64 = new bytes(bytes(uri).length - prefix.length);
+        for (uint i = 0; i < jsonBase64.length; i++) {
+            jsonBase64[i] = bytes(uri)[prefix.length + i];
+        }
+        bytes memory json = Base64.decode(string(jsonBase64));
+
+        // Ensure no raw control characters in the JSON output
+        for (uint i = 0; i < json.length; i++) {
+            uint8 ch = uint8(json[i]);
+            assertTrue(ch >= 0x20 || ch == 0, "Raw control character found in JSON");
         }
     }
 }
