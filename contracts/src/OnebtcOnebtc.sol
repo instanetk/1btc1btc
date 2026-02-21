@@ -48,7 +48,7 @@ contract OnebtcOnebtc is ERC721, ERC2981, Ownable, ReentrancyGuard {
         require(_royaltyRecipient != address(0), "Invalid royalty recipient");
         BTC_USD_FEED = AggregatorV3Interface(_btcUsdFeed);
         ETH_USD_FEED = AggregatorV3Interface(_ethUsdFeed);
-        _setDefaultRoyalty(_royaltyRecipient, 2500); // 25%
+        _setDefaultRoyalty(_royaltyRecipient, 1000); // 10%
     }
 
     /// @notice Returns the current mint price in wei (ETH equivalent of 10000 SATS)

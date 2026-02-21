@@ -188,7 +188,7 @@ contract OnebtcOnebtcTest is Test {
 
         (address receiver, uint256 royaltyAmount) = nft.royaltyInfo(0, 1 ether);
         assertEq(receiver, owner);
-        assertEq(royaltyAmount, 0.25 ether); // 25%
+        assertEq(royaltyAmount, 0.1 ether); // 10%
     }
 
     function test_maxSupply() public view {
