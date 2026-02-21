@@ -39,7 +39,7 @@ The Contract includes an on-chain upvoting mechanism limited to one vote per wal
 
 ## 6. Secondary Sales and Royalties
 
-The Contract implements ERC-2981, specifying a 25% royalty on secondary sales payable to the contract owner. Whether this royalty is honored depends on the marketplace where a secondary sale occurs — many marketplaces have reduced or eliminated creator royalty enforcement.
+The Contract implements ERC-2981, specifying a 10% royalty on secondary sales payable to the contract owner. Whether this royalty is honored depends on the marketplace where a secondary sale occurs — many marketplaces have reduced or eliminated creator royalty enforcement.
 
 You are free to sell or transfer your token on any compatible marketplace or directly via the blockchain. The project makes no representations about the resale value of any token. Most NFTs have no secondary market value.
 

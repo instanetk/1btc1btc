@@ -83,7 +83,7 @@ forge script script/Deploy.s.sol --rpc-url <RPC> --broadcast --verify  # Deploy
 - **Dynamic pricing** — 10,000 sats converted to ETH via Chainlink cbBTC/USD and ETH/USD feeds
 - **On-chain art** — SVG with logo, analogy text, and 4 randomized orbital ellipses (seeded by `keccak256(tokenId)`)
 - **Upvoting** — One vote per wallet per token, stored on-chain
-- **Royalties** — 25% ERC-2981 on secondary sales
+- **Royalties** — 10% ERC-2981 on secondary sales
 - **Security** — Reentrancy guard, oracle staleness checks (1hr), input validation (1-1000 chars), excess ETH refunds
 
 ## Architecture

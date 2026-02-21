@@ -73,9 +73,9 @@ ERC721 with fully on-chain SVG metadata. Key functions:
 | `tokenURI(uint256 tokenId)` | Returns base64 JSON data URI with embedded base64 SVG. SVG includes logo, analogy text, 4 randomized orbital ellipses (seeded by `keccak256(tokenId)`), token number, branding. |
 | `withdraw()` | Owner-only ETH withdrawal. |
 
-Events: `AnalogyMinted(uint256 indexed tokenId, address indexed minter, string analogy)`, `Upvoted(uint256 indexed tokenId, address indexed voter)`.
+Events: `AnalogyMinted(uint256 indexed tokenId, address indexed minter, string analogy)`, `Upvoted(uint256 indexed tokenId, address indexed voter)`, `Withdrawn(address indexed to, uint256 amount)`.
 
-ERC2981 royalties: 25% to deployer on secondary sales.
+ERC2981 royalties: 10% to deployer on secondary sales.
 
 Chainlink feeds (Base Mainnet): cbBTC/USD `0x07DA...9f9D`, ETH/USD `0x7104...0de9`.
 

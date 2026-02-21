@@ -17,8 +17,8 @@ export const CHAINLINK_CBBTC_USD_FEED =
 // Mint cost in satoshis
 export const MINT_COST_SATS = 10000;
 
-// Royalty basis points (25%)
-export const ROYALTY_BPS = 2500;
+// Royalty basis points (10%)
+export const ROYALTY_BPS = 1000;
 
 // Progress bar constants
 export const SATS_PER_BTC = 100_000_000;
