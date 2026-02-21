@@ -3,7 +3,8 @@ pragma solidity ^0.8.24;
 
 import {ERC721} from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import {ERC2981} from "@openzeppelin/contracts/token/common/ERC2981.sol";
-import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
+import {Ownable2Step, Ownable} from "@openzeppelin/contracts/access/Ownable2Step.sol";
+import {Pausable} from "@openzeppelin/contracts/utils/Pausable.sol";
 import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
 import {Base64} from "@openzeppelin/contracts/utils/Base64.sol";
@@ -17,7 +18,7 @@ interface AggregatorV3Interface {
     function decimals() external view returns (uint8);
 }
 
-contract OnebtcOnebtc is ERC721, ERC2981, Ownable, ReentrancyGuard {
+contract OnebtcOnebtc is ERC721, ERC2981, Ownable2Step, Pausable, ReentrancyGuard {
     using Strings for uint256;
     using Strings for address;
 
@@ -25,6 +26,8 @@ contract OnebtcOnebtc is ERC721, ERC2981, Ownable, ReentrancyGuard {
     uint256 public constant TOLERANCE_BPS = 100; // 1% tolerance
     uint256 public constant ORACLE_STALENESS = 3600; // 1 hour
     uint256 public constant MAX_SUPPLY = 10000;
+    uint256 public constant MIN_MINT_PRICE = 0.001 ether;
+    uint256 public constant MAX_MINT_PRICE = 1 ether;
 
     AggregatorV3Interface public immutable BTC_USD_FEED;
     AggregatorV3Interface public immutable ETH_USD_FEED;
@@ -75,11 +78,13 @@ contract OnebtcOnebtc is ERC721, ERC2981, Ownable, ReentrancyGuard {
         // forge-lint: disable-next-line(unsafe-typecast)
         uint256 denominator = 1e8 * uint256(ethUsdPrice) * (10 ** btcDecimals);
 
-        return numerator / denominator;
+        uint256 price = numerator / denominator;
+        require(price >= MIN_MINT_PRICE && price <= MAX_MINT_PRICE, "Price out of bounds");
+        return price;
     }
 
     /// @notice Mint an analogy as an NFT
-    function mint(string calldata analogy) external payable nonReentrant {
+    function mint(string calldata analogy) external payable whenNotPaused nonReentrant {
         require(bytes(analogy).length > 0, "Empty analogy");
         require(bytes(analogy).length <= 1000, "Analogy too long");
         require(totalSupply < MAX_SUPPLY, "Max supply reached");
@@ -415,6 +420,16 @@ contract OnebtcOnebtc is ERC721, ERC2981, Ownable, ReentrancyGuard {
         (bool success,) = owner().call{value: balance}("");
         require(success, "Withdraw failed");
         emit Withdrawn(owner(), balance);
+    }
+
+    /// @notice Pause minting (owner only, for emergencies)
+    function pause() external onlyOwner {
+        _pause();
+    }
+
+    /// @notice Unpause minting (owner only)
+    function unpause() external onlyOwner {
+        _unpause();
     }
 
     /// @dev Required override for ERC721 + ERC2981

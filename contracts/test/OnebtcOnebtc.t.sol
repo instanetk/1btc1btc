@@ -199,9 +199,9 @@ contract OnebtcOnebtcTest is Test {
     }
 
     function test_mint_failsAtMaxSupply() public {
-        // totalSupply is at storage slot 9 (after inherited ERC721/ERC2981/Ownable storage)
+        // totalSupply is at storage slot 10 (after inherited ERC721/ERC2981/Ownable2Step/Pausable storage)
         // Use vm.store to set totalSupply to MAX_SUPPLY
-        vm.store(address(nft), bytes32(uint256(9)), bytes32(uint256(10000)));
+        vm.store(address(nft), bytes32(uint256(10)), bytes32(uint256(10000)));
         assertEq(nft.totalSupply(), 10000);
 
         uint256 price = nft.getMintPriceInEth();
@@ -342,5 +342,96 @@ contract OnebtcOnebtcTest is Test {
     function test_constructor_rejectsZeroRoyaltyRecipient() public {
         vm.expectRevert("Invalid royalty recipient");
         new OnebtcOnebtc(address(btcFeed), address(ethFeed), address(0));
+    }
+
+    // --- Ownable2Step tests ---
+
+    function test_transferOwnership_requiresAcceptance() public {
+        address newOwner = address(4);
+
+        vm.prank(owner);
+        nft.transferOwnership(newOwner);
+
+        // Owner hasn't changed yet
+        assertEq(nft.owner(), owner);
+
+        // New owner accepts
+        vm.prank(newOwner);
+        nft.acceptOwnership();
+
+        assertEq(nft.owner(), newOwner);
+    }
+
+    function test_transferOwnership_rejectsUnauthorizedAccept() public {
+        address newOwner = address(4);
+
+        vm.prank(owner);
+        nft.transferOwnership(newOwner);
+
+        // Random address cannot accept
+        vm.prank(minter);
+        vm.expectRevert();
+        nft.acceptOwnership();
+    }
+
+    // --- Price bounds tests ---
+
+    function test_getMintPrice_revertsWhenTooLow() public {
+        // Set BTC very cheap, ETH very expensive → price below MIN_MINT_PRICE
+        btcFeed.setPrice(100 * 1e8);     // BTC = $100
+        ethFeed.setPrice(100_000 * 1e8); // ETH = $100,000
+
+        vm.expectRevert("Price out of bounds");
+        nft.getMintPriceInEth();
+    }
+
+    function test_getMintPrice_revertsWhenTooHigh() public {
+        // Set BTC very expensive, ETH very cheap → price above MAX_MINT_PRICE
+        btcFeed.setPrice(10_000_000 * 1e8); // BTC = $10M
+        ethFeed.setPrice(1 * 1e8);          // ETH = $1
+
+        vm.expectRevert("Price out of bounds");
+        nft.getMintPriceInEth();
+    }
+
+    // --- Pausable tests ---
+
+    function test_pause_blocksMinting() public {
+        vm.prank(owner);
+        nft.pause();
+
+        uint256 price = 0.01 ether;
+        vm.prank(minter);
+        vm.expectRevert();
+        nft.mint{value: price}("Should fail.");
+    }
+
+    function test_unpause_allowsMinting() public {
+        vm.prank(owner);
+        nft.pause();
+
+        vm.prank(owner);
+        nft.unpause();
+
+        uint256 price = nft.getMintPriceInEth();
+        vm.prank(minter);
+        nft.mint{value: price}("Should succeed.");
+
+        assertEq(nft.totalSupply(), 1);
+    }
+
+    function test_pause_failsNonOwner() public {
+        vm.prank(minter);
+        vm.expectRevert();
+        nft.pause();
+    }
+
+    function test_unpause_failsNonOwner() public {
+        vm.prank(owner);
+        nft.pause();
+
+        vm.prank(minter);
+        vm.expectRevert();
+        nft.unpause();
     }
 }
