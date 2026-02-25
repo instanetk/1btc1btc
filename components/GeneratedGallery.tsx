@@ -20,15 +20,19 @@ interface GeneratedGalleryProps {
 export function GeneratedGallery({ onConnect }: GeneratedGalleryProps) {
   const [analogies, setAnalogies] = useState<GeneratedAnalogy[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(false);
   const [page, setPage] = useState(0);
 
   const fetchAnalogies = useCallback(async () => {
     try {
+      setError(false);
+      setIsLoading(true);
       const res = await fetch("/api/analogies");
       const data = await res.json();
       setAnalogies(data.analogies ?? []);
     } catch {
       setAnalogies([]);
+      setError(true);
     } finally {
       setIsLoading(false);
     }
@@ -59,6 +63,13 @@ export function GeneratedGallery({ onConnect }: GeneratedGalleryProps) {
       {isLoading ? (
         <div className={styles.loading}>
           <div className={styles.spinner} />
+        </div>
+      ) : error ? (
+        <div className={styles.empty}>
+          <p>Failed to load thoughts.</p>
+          <button className={styles.retryButton} onClick={fetchAnalogies}>
+            Retry
+          </button>
         </div>
       ) : analogies.length === 0 ? (
         <div className={styles.empty}>

@@ -6,7 +6,7 @@ import { GallerySortToggle } from "./GallerySortToggle";
 import styles from "./Gallery.module.css";
 
 export function Gallery() {
-  const { items, isLoading, refetch, sort, setSort, page, setPage, totalPages } = useGallery();
+  const { items, isLoading, error, refetch, sort, setSort, page, setPage, totalPages } = useGallery();
 
   return (
     <section className={styles.section} id="gallery">
@@ -18,6 +18,13 @@ export function Gallery() {
       {isLoading ? (
         <div className={styles.loading}>
           <div className={styles.spinner} />
+        </div>
+      ) : error ? (
+        <div className={styles.empty}>
+          <p>Failed to load minted thoughts.</p>
+          <button className={styles.retryButton} onClick={refetch}>
+            Retry
+          </button>
         </div>
       ) : items.length === 0 ? (
         <div className={styles.empty}>

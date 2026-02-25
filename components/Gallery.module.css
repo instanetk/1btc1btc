@@ -68,6 +68,23 @@
   font-size: 0.9375rem;
 }
 
+.retryButton {
+  margin-top: 0.75rem;
+  padding: 0.375rem 0.75rem;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--color-text);
+  font-size: 0.8125rem;
+  font-family: inherit;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.retryButton:hover {
+  opacity: 0.7;
+}
+
 .pagination {
   display: flex;
   align-items: center;
