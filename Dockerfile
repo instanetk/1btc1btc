@@ -7,10 +7,15 @@ RUN yarn install --immutable
 
 # Stage 2: Build the application
 FROM node:20-alpine AS builder
+RUN corepack enable
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 ENV NEXT_TELEMETRY_DISABLED=1
+ARG NEXT_PUBLIC_ONCHAINKIT_API_KEY
+ARG NEXT_PUBLIC_CONTRACT_ADDRESS
+ARG NEXT_PUBLIC_DEPLOY_BLOCK
+ARG NEXT_PUBLIC_PROJECT_NAME
 RUN yarn build
 
 # Stage 3: Production runner
