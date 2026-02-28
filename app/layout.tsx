@@ -43,6 +43,7 @@ export default function RootLayout({
         {process.env.NEXT_PUBLIC_MATOMO_URL && (
           <Script id="matomo" strategy="afterInteractive">{`
             var _paq = window._paq = window._paq || [];
+            _paq.push(["setDoNotTrack", true]);
             _paq.push(["disableCookies"]);
             _paq.push(['trackPageView']);
             _paq.push(['enableLinkTracking']);
