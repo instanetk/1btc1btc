@@ -14,9 +14,22 @@ export const metadata: Metadata = {
   metadataBase: new URL(
     process.env.NEXT_PUBLIC_SITE_URL ?? "https://1btc1btc.money"
   ),
-  title: "1BTC=1BTC.money",
+  title: "1BTC1BTC.money",
   description:
-    "Meditative philosophical analogies about 1 BTC = 1 BTC. Generate, reflect, and mint onchain.",
+    "What does 1 BTC = 1 BTC mean? The simplest idea in Bitcoin — and the deepest. Generate reflections, mint them onchain.",
+  openGraph: {
+    title: "1BTC1BTC.money",
+    description:
+      "What does 1 BTC = 1 BTC mean? The simplest idea in Bitcoin — and the deepest. Generate reflections, mint them onchain.",
+    images: [{ url: "/og.png", width: 1200, height: 630 }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "1BTC1BTC.money",
+    description:
+      "What does 1 BTC = 1 BTC mean? The simplest idea in Bitcoin — and the deepest. Generate reflections, mint them onchain.",
+    images: ["/og.png"],
+  },
 };
 
 export default function RootLayout({
