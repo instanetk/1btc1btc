@@ -13,12 +13,14 @@ export type SortMode = "top" | "newest";
 export function useGallery() {
   const [items, setItems] = useState<GalleryItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(false);
   const [sort, setSort] = useState<SortMode>("top");
   const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
 
   const fetchGallery = useCallback(async () => {
     try {
+      setError(false);
       setIsLoading(true);
       const res = await fetch(`/api/gallery?sort=${sort}&page=${page}`);
       const data = await res.json();
@@ -36,6 +38,7 @@ export function useGallery() {
       setTotalPages(data.totalPages ?? 1);
     } catch (err) {
       console.error("Failed to fetch gallery:", err);
+      setError(true);
     } finally {
       setIsLoading(false);
     }
@@ -53,6 +56,7 @@ export function useGallery() {
   return {
     items,
     isLoading,
+    error,
     refetch: fetchGallery,
     sort,
     setSort: handleSetSort,
