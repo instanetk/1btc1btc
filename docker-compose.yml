@@ -1,5 +1,6 @@
 services:
   app:
+    image: ghcr.io/instanetk/1btc1btc:latest
     build: .
     ports:
       - "3000:3000"
