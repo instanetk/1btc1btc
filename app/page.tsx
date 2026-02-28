@@ -121,10 +121,11 @@ export default function Home() {
             </p>
           )}
 
-          <div className={styles.scrollHint}>
-            <span className={styles.scrollLabel}>GALLERY</span>
-            <span className={styles.scrollArrow}>&darr;</span>
-          </div>
+        </div>
+
+        <div className={styles.scrollHint}>
+          <span className={styles.scrollLabel}>GALLERY</span>
+          <span className={styles.scrollArrow}>&darr;</span>
         </div>
       </section>
 
