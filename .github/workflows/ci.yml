@@ -80,5 +80,6 @@ jobs:
             NEXT_PUBLIC_CONTRACT_ADDRESS=${{ secrets.NEXT_PUBLIC_CONTRACT_ADDRESS }}
             NEXT_PUBLIC_DEPLOY_BLOCK=${{ secrets.NEXT_PUBLIC_DEPLOY_BLOCK }}
             NEXT_PUBLIC_PROJECT_NAME=${{ secrets.NEXT_PUBLIC_PROJECT_NAME }}
+            NEXT_PUBLIC_MATOMO_URL=${{ secrets.NEXT_PUBLIC_MATOMO_URL }}
           cache-from: type=gha
           cache-to: type=gha,mode=max

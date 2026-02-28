@@ -18,8 +18,8 @@ jobs:
           username: ${{ secrets.DROPLET_USER }}
           key: ${{ secrets.DROPLET_SSH_KEY }}
           script: |
-            cd /var/www/1btc1btc
+            cd /var/www/1btc1btc.money/1btc1btc
             echo ${{ secrets.GHCR_PAT }} | docker login ghcr.io -u ${{ github.repository_owner }} --password-stdin
-            docker compose pull
+            docker pull ghcr.io/${{ github.repository_owner }}/1btc1btc:latest
             docker compose up -d
             docker image prune -f
