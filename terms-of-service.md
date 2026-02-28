@@ -1,6 +1,6 @@
 # 1BTC1BTC.money — Terms of Service
 
-_Last updated: February 28, 2026_
+*Last updated: February 28, 2026*
 
 By accessing 1BTC1BTC.money (the "Site") or interacting with the OnebtcOnebtc smart contract on Base (the "Contract"), you agree to these Terms of Service ("Terms"). If you do not agree, do not use the Site or mint any tokens.
 
