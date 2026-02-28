@@ -1,6 +1,6 @@
 # 1BTC1BTC.money — Terms of Service
 
-*Last updated: February 20, 2026*
+_Last updated: February 28, 2026_
 
 By accessing 1BTC1BTC.money (the "Site") or interacting with the OnebtcOnebtc smart contract on Base (the "Contract"), you agree to these Terms of Service ("Terms"). If you do not agree, do not use the Site or mint any tokens.
 
@@ -75,7 +75,7 @@ The Site collects minimal data:
 - **Wallet addresses** are inherently public on the blockchain. The Site reads on-chain data (minted tokens, upvotes) to populate the gallery.
 - **IP addresses** are used transiently for rate limiting (1 request per IP per 3 seconds on the generation endpoint) and are not stored long-term.
 - **Unminted analogies** are stored in a database (MongoDB) and associated with a session, not with a wallet address or personally identifiable information.
-- **Analytics**, if enabled, are collected via self-hosted Plausible Analytics, which does not use cookies or collect personal data.
+- **Analytics**, if enabled, are collected via self-hosted Matomo Analytics, which does not use cookies or collect personal data.
 
 No personal data is sold to or shared with third parties.
 

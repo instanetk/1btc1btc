@@ -40,13 +40,20 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.variable}>
-        {process.env.NEXT_PUBLIC_PLAUSIBLE_HOST && (
-          <Script
-            defer
-            data-domain="1btc1btc.money"
-            src={`${process.env.NEXT_PUBLIC_PLAUSIBLE_HOST}/js/script.js`}
-            strategy="afterInteractive"
-          />
+        {process.env.NEXT_PUBLIC_MATOMO_URL && (
+          <Script id="matomo" strategy="afterInteractive">{`
+            var _paq = window._paq = window._paq || [];
+            _paq.push(["disableCookies"]);
+            _paq.push(['trackPageView']);
+            _paq.push(['enableLinkTracking']);
+            (function() {
+              var u="${process.env.NEXT_PUBLIC_MATOMO_URL}";
+              _paq.push(['setTrackerUrl', u+'matomo.php']);
+              _paq.push(['setSiteId', '3']);
+              var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
+              g.async=true; g.src=u+'matomo.js'; s.parentNode.insertBefore(g,s);
+            })();
+          `}</Script>
         )}
         <Providers>{children}</Providers>
       </body>
