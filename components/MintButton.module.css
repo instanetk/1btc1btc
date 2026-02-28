@@ -1,5 +1,10 @@
 .wrapper {
   flex-shrink: 0;
+  width: 100%;
+}
+
+.wrapper .button {
+  width: 100%;
 }
 
 .button {
