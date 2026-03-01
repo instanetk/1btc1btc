@@ -141,7 +141,7 @@ export default function Home() {
       <div className={styles.divider} />
 
       {/* Generated (unminted) thoughts */}
-      <GeneratedGallery onConnect={openWalletModal} />
+      <GeneratedGallery onConnect={openWalletModal} onMintSuccess={() => setGalleryRefreshKey((k) => k + 1)} />
     </div>
   );
 }

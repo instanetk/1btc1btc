@@ -15,9 +15,10 @@ interface GeneratedAnalogy {
 
 interface GeneratedGalleryProps {
   onConnect: () => void;
+  onMintSuccess?: () => void;
 }
 
-export function GeneratedGallery({ onConnect }: GeneratedGalleryProps) {
+export function GeneratedGallery({ onConnect, onMintSuccess }: GeneratedGalleryProps) {
   const [analogies, setAnalogies] = useState<GeneratedAnalogy[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -46,10 +47,11 @@ export function GeneratedGallery({ onConnect }: GeneratedGalleryProps) {
 
   const handleMintSuccess = useCallback((analogyId: string) => {
     setMintedIds((prev) => new Set(prev).add(analogyId));
+    onMintSuccess?.();
     setTimeout(() => {
       fetchAnalogies();
     }, 3000);
-  }, [fetchAnalogies]);
+  }, [fetchAnalogies, onMintSuccess]);
 
   const totalPages = Math.max(1, Math.ceil(analogies.length / PAGE_SIZE));
   const pagedAnalogies = analogies.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
