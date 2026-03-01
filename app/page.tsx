@@ -1,5 +1,5 @@
 "use client";
-import { useState, useCallback, useRef, useEffect } from "react";
+import { useState, useCallback } from "react";
 import Image from "next/image";
 import { OrbitalBackground } from "@/components/OrbitalBackground";
 import { AnalogyDisplay } from "@/components/AnalogyDisplay";
@@ -21,15 +21,6 @@ export default function Home() {
   const [mintSuccess, setMintSuccess] = useState<string | null>(null);
   const [walletModalOpen, setWalletModalOpen] = useState(false);
   const [infoSidebarOpen, setInfoSidebarOpen] = useState(false);
-
-  const buttonsRef = useRef<HTMLDivElement>(null);
-
-  // Scroll the buttons into view when an analogy appears
-  useEffect(() => {
-    if (analogy && buttonsRef.current) {
-      buttonsRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
-    }
-  }, [analogy]);
 
   const openWalletModal = useCallback(() => setWalletModalOpen(true), []);
   const closeWalletModal = useCallback(() => setWalletModalOpen(false), []);
@@ -96,7 +87,7 @@ export default function Home() {
 
           <AnalogyDisplay analogy={analogy} isLoading={isGenerating} />
 
-          <div className={styles.buttons} ref={buttonsRef}>
+          <div className={styles.buttons}>
             <GenerateButton
               onGenerate={handleGenerate}
               isLoading={isGenerating}
