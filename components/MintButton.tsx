@@ -1,5 +1,5 @@
 "use client";
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useAccount, useWriteContract, useWaitForTransactionReceipt } from "wagmi";
 import { decodeEventLog } from "viem";
 import { contractConfig, ONEBTC_ABI } from "@/lib/contract";
@@ -95,9 +95,13 @@ export function MintButton({ analogy, analogyId, onSuccess, onConnect, onOpenTer
     }
   }, [isSuccess, txHash, onSuccess, analogyId, address, receipt]);
 
+  const [showToast, setShowToast] = useState(false);
   useEffect(() => {
-    if (writeError) {
+    if (writeError && !writeError.message.includes("User rejected")) {
       trackEvent("Mint Fail");
+      setShowToast(true);
+      const timer = setTimeout(() => setShowToast(false), 6000);
+      return () => clearTimeout(timer);
     }
   }, [writeError]);
 
@@ -126,12 +130,17 @@ export function MintButton({ analogy, analogyId, onSuccess, onConnect, onOpenTer
           </button>
         </p>
       )}
-      {writeError && (
-        <p className={styles.error}>
-          {writeError.message.includes("User rejected")
-            ? "Transaction cancelled."
-            : "Mint failed. Please try again."}
-        </p>
+      {writeError?.message.includes("User rejected") && (
+        <p className={styles.error}>Transaction cancelled.</p>
+      )}
+      {showToast && (
+        <div className={styles.toast}>
+          <svg className={styles.baseLogo} viewBox="0 0 111 111" xmlns="http://www.w3.org/2000/svg">
+            <rect width="111" height="111" rx="5.55" fill="#0000FF"/>
+          </svg>
+          <span className={styles.toastText}>Ensure your wallet is on the Base network.</span>
+          <button className={styles.toastClose} onClick={() => setShowToast(false)}>✕</button>
+        </div>
       )}
     </div>
   );
