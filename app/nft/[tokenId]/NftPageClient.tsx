@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { useReadContract } from "wagmi";
 import { contractConfig } from "@/lib/contract";
+import { ProgressBar } from "@/components/ProgressBar";
+import { InfoSidebar } from "@/components/InfoSidebar";
 import styles from "./NftPage.module.css";
 
 export default function NftPageClient({ tokenId }: { tokenId: string }) {
@@ -28,6 +30,8 @@ export default function NftPageClient({ tokenId }: { tokenId: string }) {
 
   return (
     <main className={styles.page}>
+      <ProgressBar />
+      <InfoSidebar />
       <div className={styles.container}>
         <h1 className={styles.title}>1BTC1BTC #{tokenId}</h1>
         <div className={styles.imageContainer}>
@@ -45,9 +49,14 @@ export default function NftPageClient({ tokenId }: { tokenId: string }) {
           )}
         </div>
         {analogy && <p className={styles.analogy}>{analogy}</p>}
-        <Link className={styles.galleryLink} href="/#gallery">
-          View Gallery
-        </Link>
+        <div className={styles.links}>
+          <Link className={styles.cta} href="/">
+            Generate Your Own Thought
+          </Link>
+          <Link className={styles.galleryLink} href="/#gallery">
+            View Gallery
+          </Link>
+        </div>
       </div>
     </main>
   );
