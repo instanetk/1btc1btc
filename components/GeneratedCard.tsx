@@ -10,13 +10,14 @@ interface GeneratedAnalogy {
 
 interface GeneratedCardProps {
   analogy: GeneratedAnalogy;
+  minted: boolean;
   onMintSuccess: () => void;
   onConnect: () => void;
 }
 
-export function GeneratedCard({ analogy, onMintSuccess, onConnect }: GeneratedCardProps) {
+export function GeneratedCard({ analogy, minted, onMintSuccess, onConnect }: GeneratedCardProps) {
   return (
-    <div className={styles.card}>
+    <div className={`${styles.card} ${minted ? styles.minted : ""}`}>
       <p className={styles.analogy}>{analogy.text}</p>
       <div className={styles.footer}>
         <span className={styles.domain}>{analogy.domain}</span>
@@ -28,6 +29,11 @@ export function GeneratedCard({ analogy, onMintSuccess, onConnect }: GeneratedCa
           compact
         />
       </div>
+      {minted && (
+        <div className={styles.mintedOverlay}>
+          <span className={styles.mintedBadge}>Minted!</span>
+        </div>
+      )}
     </div>
   );
 }

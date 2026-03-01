@@ -42,8 +42,13 @@ export function GeneratedGallery({ onConnect }: GeneratedGalleryProps) {
     fetchAnalogies();
   }, [fetchAnalogies]);
 
-  const handleMintSuccess = useCallback(() => {
-    fetchAnalogies();
+  const [mintedIds, setMintedIds] = useState<Set<string>>(new Set());
+
+  const handleMintSuccess = useCallback((analogyId: string) => {
+    setMintedIds((prev) => new Set(prev).add(analogyId));
+    setTimeout(() => {
+      fetchAnalogies();
+    }, 3000);
   }, [fetchAnalogies]);
 
   const totalPages = Math.max(1, Math.ceil(analogies.length / PAGE_SIZE));
@@ -82,7 +87,8 @@ export function GeneratedGallery({ onConnect }: GeneratedGalleryProps) {
               <GeneratedCard
                 key={analogy._id}
                 analogy={analogy}
-                onMintSuccess={handleMintSuccess}
+                minted={mintedIds.has(analogy._id)}
+                onMintSuccess={() => handleMintSuccess(analogy._id)}
                 onConnect={onConnect}
               />
             ))}
