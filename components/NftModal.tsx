@@ -54,12 +54,14 @@ export function NftModal({ item, onUpvoteSuccess, onClose }: NftModalProps) {
           {isLoading ? (
             <div className={styles.spinner} />
           ) : imageUri ? (
-            /* eslint-disable-next-line @next/next/no-img-element */
-            <img
-              className={styles.nftImage}
-              src={imageUri}
-              alt={`NFT #${item.tokenId.toString()}`}
-            />
+            <Link href={`/nft/${item.tokenId.toString()}`}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                className={styles.nftImage}
+                src={imageUri}
+                alt={`NFT #${item.tokenId.toString()}`}
+              />
+            </Link>
           ) : (
             <span>Failed to load NFT</span>
           )}
