@@ -53,7 +53,7 @@ export async function POST(request: Request) {
     const { prompt, domain } = getAnalogyUserPrompt();
 
     const message = await anthropic.messages.create({
-      model: "claude-sonnet-4-5-20250929",
+      model: "claude-sonnet-4-6",
       max_tokens: 256,
       temperature: 0.95,
       system: ANALOGY_SYSTEM_PROMPT,
