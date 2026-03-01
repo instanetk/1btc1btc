@@ -11,6 +11,7 @@ import { trackEvent } from "@/lib/analytics";
 import { ConnectButton } from "@/components/ConnectButton";
 import { WalletModal } from "@/components/WalletModal";
 import { UpvoteButton } from "@/components/UpvoteButton";
+import { OrbitalBackground } from "@/components/OrbitalBackground";
 import { ProgressBar } from "@/components/ProgressBar";
 import { InfoSidebar } from "@/components/InfoSidebar";
 import styles from "./NftPage.module.css";
@@ -62,6 +63,9 @@ export default function NftPageClient({ tokenId }: { tokenId: string }) {
 
   return (
     <main className={styles.page}>
+      <div className={styles.orbitalFaint}>
+        <OrbitalBackground />
+      </div>
       <ProgressBar />
       <InfoSidebar />
 
