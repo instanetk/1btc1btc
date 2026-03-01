@@ -8,8 +8,9 @@
 
 .header {
   position: fixed;
-  top: 1rem;
-  right: 1rem;
+  top: 24px;
+  right: 0;
+  padding: 1rem;
   z-index: 100;
 }
 
@@ -60,6 +61,7 @@
   justify-content: space-between;
   width: 100%;
   gap: 0.75rem;
+  margin-top: -0.75rem;
 }
 
 .owner {
