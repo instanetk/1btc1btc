@@ -31,6 +31,14 @@
   font-size: 1rem;
   font-weight: 600;
   color: var(--color-text);
+  text-decoration: underline dotted;
+  text-underline-offset: 3px;
+  text-decoration-color: var(--color-text-muted);
+  transition: text-decoration-color 0.2s ease;
+}
+
+.title:hover {
+  text-decoration-color: var(--color-accent);
 }
 
 .close {

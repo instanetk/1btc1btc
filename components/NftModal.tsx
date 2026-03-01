@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 import { useReadContract } from "wagmi";
 import { Identity, Name, Avatar } from "@coinbase/onchainkit/identity";
 import { base } from "wagmi/chains";
@@ -44,7 +45,7 @@ export function NftModal({ item, onUpvoteSuccess, onClose }: NftModalProps) {
     <div className={styles.backdrop} onClick={onClose}>
       <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
         <div className={styles.header}>
-          <span className={styles.title}>1BTC1BTC #{item.tokenId.toString()}</span>
+          <Link href={`/nft/${item.tokenId.toString()}`} className={styles.title}>1BTC1BTC #{item.tokenId.toString()}</Link>
           <button className={styles.close} onClick={onClose}>
             ✕
           </button>
