@@ -64,6 +64,13 @@ export const ONEBTC_ABI = [
   },
   {
     type: "function",
+    name: "ownerOf",
+    inputs: [{ name: "tokenId", type: "uint256", internalType: "uint256" }],
+    outputs: [{ name: "", type: "address", internalType: "address" }],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
     name: "tokenURI",
     inputs: [{ name: "tokenId", type: "uint256", internalType: "uint256" }],
     outputs: [{ name: "", type: "string", internalType: "string" }],
