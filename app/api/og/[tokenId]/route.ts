@@ -32,7 +32,10 @@ export async function GET(
     // Decode base64 SVG from data URI
     const svgBuffer = Buffer.from(svgDataUri.split(",")[1], "base64");
 
-    const pngBuffer = await sharp(svgBuffer).png().toBuffer();
+    const pngBuffer = await sharp(svgBuffer)
+      .resize(1200, 1200)
+      .png()
+      .toBuffer();
 
     return new NextResponse(new Uint8Array(pngBuffer), {
       headers: {
