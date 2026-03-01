@@ -10,7 +10,7 @@ export type GalleryItem = {
 
 export type SortMode = "top" | "newest";
 
-export function useGallery() {
+export function useGallery(refreshKey?: number) {
   const [items, setItems] = useState<GalleryItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -46,7 +46,7 @@ export function useGallery() {
 
   useEffect(() => {
     fetchGallery();
-  }, [fetchGallery]);
+  }, [fetchGallery, refreshKey]);
 
   const handleSetSort = useCallback((s: SortMode) => {
     setSort(s);

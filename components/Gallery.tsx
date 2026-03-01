@@ -5,8 +5,8 @@ import { GalleryCard } from "./GalleryCard";
 import { GallerySortToggle } from "./GallerySortToggle";
 import styles from "./Gallery.module.css";
 
-export function Gallery() {
-  const { items, isLoading, error, refetch, sort, setSort, page, setPage, totalPages } = useGallery();
+export function Gallery({ refreshKey }: { refreshKey?: number }) {
+  const { items, isLoading, error, refetch, sort, setSort, page, setPage, totalPages } = useGallery(refreshKey);
 
   return (
     <section className={styles.section} id="gallery">

@@ -21,6 +21,7 @@ export default function Home() {
   const [mintSuccess, setMintSuccess] = useState<string | null>(null);
   const [walletModalOpen, setWalletModalOpen] = useState(false);
   const [infoSidebarOpen, setInfoSidebarOpen] = useState(false);
+  const [galleryRefreshKey, setGalleryRefreshKey] = useState(0);
 
   const openWalletModal = useCallback(() => setWalletModalOpen(true), []);
   const closeWalletModal = useCallback(() => setWalletModalOpen(false), []);
@@ -57,6 +58,7 @@ export default function Home() {
     setMintSuccess(txHash);
     setAnalogy(null);
     setAnalogyId(null);
+    setGalleryRefreshKey((k) => k + 1);
   }, []);
 
   return (
@@ -133,7 +135,7 @@ export default function Home() {
       <div className={styles.divider} />
 
       {/* Gallery section */}
-      <Gallery />
+      <Gallery refreshKey={galleryRefreshKey} />
 
       {/* Divider */}
       <div className={styles.divider} />
