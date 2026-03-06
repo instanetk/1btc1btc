@@ -5,6 +5,7 @@ import { CHAIN } from "@/lib/constants";
 import { ThemeProvider } from "@coinbase/cds-web";
 import { MediaQueryProvider } from "@coinbase/cds-web/system";
 import { onebtcTheme } from "@/lib/theme";
+import { Ticker } from "@/components/Ticker";
 
 export function Providers({ children }: { children: ReactNode }) {
   return (
@@ -24,6 +25,7 @@ export function Providers({ children }: { children: ReactNode }) {
           }}
         >
           {children}
+          <Ticker />
         </OnchainKitProvider>
       </ThemeProvider>
     </MediaQueryProvider>

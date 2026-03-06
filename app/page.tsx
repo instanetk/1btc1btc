@@ -11,7 +11,6 @@ import { Gallery } from "@/components/Gallery";
 import { GeneratedGallery } from "@/components/GeneratedGallery";
 import { ProgressBar } from "@/components/ProgressBar";
 import { InfoSidebar } from "@/components/InfoSidebar";
-import { Ticker } from "@/components/Ticker";
 import styles from "./page.module.css";
 
 export default function Home() {
@@ -144,8 +143,6 @@ export default function Home() {
       {/* Generated (unminted) thoughts */}
       <GeneratedGallery onConnect={openWalletModal} onMintSuccess={() => setGalleryRefreshKey((k) => k + 1)} />
 
-      {/* Absurd Bitcoin Ticker */}
-      <Ticker />
     </div>
   );
 }

@@ -7,32 +7,30 @@
   background: #111111;
   border-top: 1px solid #1A1A1A;
   z-index: 50;
-  overflow: hidden;
+  overflow: visible;
   display: flex;
   align-items: center;
-  font-family: "SF Mono", "Fira Code", "Fira Mono", "Roboto Mono", monospace;
-  font-size: 0.75rem;
+  font-family: var(--font-pixel), monospace;
+  font-size: 1rem;
+  text-transform: uppercase;
   color: var(--color-text);
+}
+
+.trackWrapper {
+  overflow: hidden;
+  flex: 1;
+  min-width: 0;
 }
 
 .track {
   display: flex;
   white-space: nowrap;
-  animation: ticker-scroll var(--ticker-duration, 120s) linear infinite;
   will-change: transform;
 }
 
-.track:hover {
-  animation-play-state: paused;
-}
-
-@keyframes ticker-scroll {
-  0% {
-    transform: translateX(0);
-  }
-  100% {
-    transform: translateX(-50%);
-  }
+.copy {
+  display: inline-flex;
+  flex-shrink: 0;
 }
 
 .item {
@@ -66,19 +64,90 @@
   margin-left: 0.25rem;
 }
 
+/* Price flash animations */
+@keyframes flashGreen {
+  0%, 40% {
+    color: #00ff64;
+    text-shadow: 0 0 12px rgba(0, 255, 100, 0.9), 0 0 24px rgba(0, 255, 100, 0.4);
+  }
+  100% {
+    color: var(--color-accent);
+    text-shadow: none;
+  }
+}
+
+@keyframes flashRed {
+  0%, 40% {
+    color: #ff4444;
+    text-shadow: 0 0 12px rgba(255, 68, 68, 0.9), 0 0 24px rgba(255, 68, 68, 0.4);
+  }
+  100% {
+    color: var(--color-accent);
+    text-shadow: none;
+  }
+}
+
+.flashUp {
+  animation: flashGreen 2s ease-out;
+}
+
+.flashDown {
+  animation: flashRed 2s ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .flashUp,
+  .flashDown {
+    animation: none;
+  }
+}
+
+/* Latest Mint NFT Item */
+.nftItem {
+  background: rgba(0, 255, 100, 0.08);
+  border-left: 2px solid #00ff64;
+  border-right: 2px solid #00ff64;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  margin: 0 0.25rem;
+}
+
+.nftLink {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+}
+
+.nftLabel {
+  color: #00ff64;
+  font-weight: 600;
+  margin-right: 0.5rem;
+  letter-spacing: 0.05em;
+}
+
+.nftValue {
+  color: var(--color-text);
+  font-weight: 600;
+}
+
+.nftUnit {
+  color: var(--color-text-muted);
+  margin-left: 0.25rem;
+}
+
 /* Tooltip */
 .tooltip {
-  display: none;
   position: absolute;
   bottom: calc(100% + 8px);
-  left: 50%;
   transform: translateX(-50%);
   background: #1a1a1a;
   border: 1px solid #2a2a2a;
   border-radius: 6px;
   padding: 6px 10px;
-  font-size: 0.6875rem;
-  color: var(--color-text-muted);
+  font-size: 0.875rem;
+  color: #fff;
   white-space: normal;
   width: max-content;
   max-width: 240px;
@@ -95,10 +164,6 @@
   transform: translateX(-50%);
   border: 4px solid transparent;
   border-top-color: #2a2a2a;
-}
-
-.item:hover .tooltip {
-  display: block;
 }
 
 /* Controls */
@@ -132,21 +197,6 @@
   color: var(--color-accent);
 }
 
-.dismissButton {
-  background: none;
-  border: none;
-  color: var(--color-text-muted);
-  font-size: 1rem;
-  cursor: pointer;
-  padding: 4px;
-  line-height: 1;
-  font-family: inherit;
-  transition: color 0.15s ease;
-}
-
-.dismissButton:hover {
-  color: var(--color-text);
-}
 
 /* Manifesto Modal */
 .backdrop {
@@ -239,7 +289,7 @@
 /* Mobile */
 @media (max-width: 480px) {
   .ticker {
-    font-size: 0.6875rem;
+    font-size: 0.8125rem;
   }
 
   .whyButton {

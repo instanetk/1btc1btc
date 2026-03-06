@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Script from "next/script";
 import { Inter } from "next/font/google";
+import { tickerFont } from "@/lib/fonts";
 import { Providers } from "./providers";
 import "@coinbase/onchainkit/styles.css";
 import "./globals.css";
@@ -9,6 +10,7 @@ const inter = Inter({
   variable: "--font-inter",
   subsets: ["latin"],
 });
+
 
 export const metadata: Metadata = {
   metadataBase: new URL(
@@ -39,7 +41,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={inter.variable}>
+      <body className={`${inter.variable} ${tickerFont.variable}`}>
         {process.env.NEXT_PUBLIC_MATOMO_URL && (
           <Script id="matomo" strategy="afterInteractive">{`
             var _paq = window._paq = window._paq || [];

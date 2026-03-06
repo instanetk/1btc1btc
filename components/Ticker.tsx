@@ -1,58 +1,140 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import Link from "next/link";
 import { useTickerData } from "@/hooks/useTickerData";
 import styles from "./Ticker.module.css";
 
-const STORAGE_KEY = "ticker-dismissed";
-
 export function Ticker() {
-  const { items, isLoading } = useTickerData();
-  const [dismissed, setDismissed] = useState(false);
+  const { items, isLoading, flashes } = useTickerData();
   const [manifestoOpen, setManifestoOpen] = useState(false);
   const [hydrated, setHydrated] = useState(false);
+  const [activeTooltip, setActiveTooltip] = useState<{ text: string; x: number } | null>(null);
+  const trackRef = useRef<HTMLDivElement>(null);
+  const offsetRef = useRef(0);
+  const rafRef = useRef<number>(0);
+  const pausedRef = useRef(false);
+  const halfWidthRef = useRef(0);
+  const speedRef = useRef(50);
+  const firstCopyRef = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
     setHydrated(true);
-    if (typeof window !== "undefined") {
-      setDismissed(sessionStorage.getItem(STORAGE_KEY) === "1");
-    }
   }, []);
 
-  function handleDismiss() {
-    setDismissed(true);
-    sessionStorage.setItem(STORAGE_KEY, "1");
-  }
+  // Re-measure when items change (without restarting the animation)
+  useEffect(() => {
+    const firstCopy = firstCopyRef.current;
+    if (!firstCopy || items.length === 0) return;
 
-  // Don't render during SSR or while loading or if dismissed
-  if (!hydrated || isLoading || dismissed || items.length === 0) {
+    // Measure exact pixel width of the first copy using getBoundingClientRect
+    const newHalfWidth = firstCopy.getBoundingClientRect().width;
+    const oldHalfWidth = halfWidthRef.current;
+
+    // Scale offset proportionally so position stays visually consistent
+    if (oldHalfWidth > 0 && newHalfWidth > 0) {
+      offsetRef.current = (offsetRef.current / oldHalfWidth) * newHalfWidth;
+    }
+
+    halfWidthRef.current = newHalfWidth;
+    speedRef.current = newHalfWidth / (items.length * 3);
+  }, [items]);
+
+  // Animation loop — runs once on mount, never restarts
+  useEffect(() => {
+    let lastTime = 0;
+
+    const animate = (time: number) => {
+      if (lastTime === 0) lastTime = time;
+      const delta = time - lastTime;
+      lastTime = time;
+
+      const halfWidth = halfWidthRef.current;
+
+      if (!pausedRef.current && halfWidth > 0) {
+        offsetRef.current += (speedRef.current * delta) / 1000;
+        if (offsetRef.current >= halfWidth) {
+          offsetRef.current -= halfWidth;
+        }
+        const track = trackRef.current;
+        if (track) {
+          track.style.transform = `translateX(-${offsetRef.current}px)`;
+        }
+      }
+
+      rafRef.current = requestAnimationFrame(animate);
+    };
+
+    rafRef.current = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(rafRef.current);
+  }, []);
+
+  if (!hydrated || isLoading || items.length === 0) {
     return null;
   }
-
-  // Dynamic duration: ~3s per item for comfortable reading speed
-  const duration = items.length * 3;
 
   return (
     <>
       <div className={styles.ticker}>
-        <div
-          className={styles.track}
-          style={{ "--ticker-duration": `${duration}s` } as React.CSSProperties}
-        >
-          {/* Duplicate items for seamless infinite scroll */}
-          {[...items, ...items].map((item, i) => (
-            <span key={i} className={styles.item}>
-              <span className={styles.separator}>·</span>
-              <span className={styles.label}>
-                1 <span className={styles.btcSymbol}>₿</span> ={" "}
+        <div className={styles.trackWrapper}>
+          <div
+            ref={trackRef}
+            className={styles.track}
+            onMouseEnter={() => { pausedRef.current = true; }}
+            onMouseLeave={() => { pausedRef.current = false; }}
+          >
+            {/* Two identical copies for seamless infinite scroll */}
+            {[0, 1].map((copy) => (
+              <span
+                key={copy}
+                ref={copy === 0 ? firstCopyRef : undefined}
+                className={styles.copy}
+              >
+                {items.map((item, i) => (
+                  <span
+                    key={`${copy}-${i}`}
+                    className={`${styles.item} ${item.category === "nft" ? styles.nftItem : ""}`}
+                    onMouseEnter={(e) => {
+                      if (item.tooltip) {
+                        const rect = e.currentTarget.getBoundingClientRect();
+                        setActiveTooltip({ text: item.tooltip, x: rect.left + rect.width / 2 });
+                      }
+                    }}
+                    onMouseLeave={() => setActiveTooltip(null)}
+                  >
+                    <span className={styles.separator}>·</span>
+                    {item.category === "nft" && item.href ? (
+                      <Link href={item.href} className={styles.nftLink}>
+                        <span className={styles.nftLabel}>LATEST MINT</span>
+                        <span className={styles.nftValue}>{item.value}</span>
+                        <span className={styles.nftUnit}>{" "}{item.unit}</span>
+                      </Link>
+                    ) : (
+                      <>
+                        <span className={styles.label}>
+                          1 <span className={styles.btcSymbol}>BTC</span> =&nbsp;
+                        </span>
+                        <span className={`${styles.value} ${
+                          flashes.get(item.id) === "up" ? styles.flashUp :
+                          flashes.get(item.id) === "down" ? styles.flashDown : ""
+                        }`}>{item.value}</span>
+                        <span className={styles.unit}>{" "}{item.unit}</span>
+                      </>
+                    )}
+                  </span>
+                ))}
               </span>
-              <span className={styles.value}>{item.value}</span>
-              <span className={styles.unit}>{" "}{item.unit}</span>
-              {item.tooltip && (
-                <span className={styles.tooltip}>{item.tooltip}</span>
-              )}
-            </span>
-          ))}
+            ))}
+          </div>
         </div>
+
+        {activeTooltip && (
+          <span
+            className={styles.tooltip}
+            style={{ left: activeTooltip.x }}
+          >
+            {activeTooltip.text}
+          </span>
+        )}
 
         <div className={styles.controls}>
           <button
@@ -60,13 +142,6 @@ export function Ticker() {
             onClick={() => setManifestoOpen(true)}
           >
             Why not dollars? →
-          </button>
-          <button
-            className={styles.dismissButton}
-            onClick={handleDismiss}
-            aria-label="Close ticker"
-          >
-            ×
           </button>
         </div>
       </div>
