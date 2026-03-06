@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/mongodb";
 import { Analogy } from "@/lib/models/Analogy";
+import { publishToSocial } from "@/lib/social";
 
 export async function POST(
   request: Request,
@@ -43,6 +44,15 @@ export async function POST(
         { error: "Analogy not found." },
         { status: 404 }
       );
+    }
+
+    // Auto-publish to social media (fire-and-forget, never blocks response)
+    if (tokenId != null) {
+      publishToSocial({
+        tokenId: Number(tokenId),
+        analogyText: updated.text,
+        domain: updated.domain,
+      });
     }
 
     return NextResponse.json({ success: true });
