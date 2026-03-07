@@ -48,6 +48,16 @@
   transition: opacity 800ms ease-in;
 }
 
+.compact {
+  min-height: 120px;
+  padding: 1.25rem 1rem;
+}
+
+.compact .provocation,
+.compact .analogy {
+  font-size: clamp(1rem, 2.5vw, 1.25rem);
+}
+
 .spinner {
   width: 24px;
   height: 24px;

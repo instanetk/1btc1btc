@@ -21,9 +21,10 @@ interface AnalogyDisplayProps {
   analogy: string | null;
   isLoading: boolean;
   onTextVisible?: (visible: boolean) => void;
+  compact?: boolean;
 }
 
-export function AnalogyDisplay({ analogy, isLoading, onTextVisible }: AnalogyDisplayProps) {
+export function AnalogyDisplay({ analogy, isLoading, onTextVisible, compact }: AnalogyDisplayProps) {
   const [currentProvocationIndex, setCurrentProvocationIndex] = useState(
     () => Math.floor(Math.random() * PROVOCATIONS.length)
   );
@@ -71,7 +72,7 @@ export function AnalogyDisplay({ analogy, isLoading, onTextVisible }: AnalogyDis
 
   // Determine container state: halo or card
   const isCard = analogy !== null || (isLoading && hasEverGeneratedRef.current);
-  const containerClass = `${styles.container} ${isCard ? styles.card : styles.halo}`;
+  const containerClass = `${styles.container} ${isCard ? styles.card : styles.halo}${compact ? ` ${styles.compact}` : ""}`;
 
   return (
     <div className={containerClass}>

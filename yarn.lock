@@ -14,6 +14,8 @@ __metadata:
     "@coinbase/cds-web": ^8.43.0
     "@coinbase/onchainkit": latest
     "@eslint/eslintrc": ^3
+    "@farcaster/miniapp-sdk": ^0.2.3
+    "@farcaster/miniapp-wagmi-connector": ^1.1.1
     "@next/eslint-plugin-next": 15.3.4
     "@tanstack/react-query": ^5.81.5
     "@types/node": ^20
@@ -606,6 +608,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@farcaster/miniapp-core@npm:0.5.1":
+  version: 0.5.1
+  resolution: "@farcaster/miniapp-core@npm:0.5.1"
+  dependencies:
+    "@solana/web3.js": ^1.98.2
+    ox: ^0.4.4
+    zod: ^3.25.0
+  checksum: ec08961b949e43abb285b3fafa063a1da1b81e7fd93d0da19b6b7ce337ecb4177192ecb70e55c553c5479dac3447e68b803f34e20be543c929b086dd903ccaed
+  languageName: node
+  linkType: hard
+
 "@farcaster/miniapp-sdk@npm:^0.1.8":
   version: 0.1.10
   resolution: "@farcaster/miniapp-sdk@npm:0.1.10"
@@ -619,6 +632,19 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@farcaster/miniapp-sdk@npm:^0.2.3":
+  version: 0.2.3
+  resolution: "@farcaster/miniapp-sdk@npm:0.2.3"
+  dependencies:
+    "@farcaster/miniapp-core": 0.5.1
+    "@farcaster/quick-auth": ^0.0.6
+    comlink: ^4.4.2
+    eventemitter3: ^5.0.1
+    ox: ^0.4.4
+  checksum: 9c9922a7718d466bee7cc4c6ac0d97d671949da545b67777d458aef6bd60f8e08daf9858212bd27c4acd29bb60dff9e3ac576c16c5565c692609a1f194c6128a
+  languageName: node
+  linkType: hard
+
 "@farcaster/miniapp-wagmi-connector@npm:^1.0.0":
   version: 1.1.0
   resolution: "@farcaster/miniapp-wagmi-connector@npm:1.1.0"
@@ -627,6 +653,17 @@ __metadata:
     "@wagmi/core": ^2.14.1
     viem: ^2.21.55
   checksum: 45b18ed314a1cb712c5ef2a555178690d23f3cb261905fea2ec38eea6a5986476f44b972b9c7226ca34dc75b9af202aa66cf8643705915d9837c172d74239069
+  languageName: node
+  linkType: hard
+
+"@farcaster/miniapp-wagmi-connector@npm:^1.1.1":
+  version: 1.1.1
+  resolution: "@farcaster/miniapp-wagmi-connector@npm:1.1.1"
+  peerDependencies:
+    "@farcaster/miniapp-sdk": ^0.2.3
+    "@wagmi/core": ^2.14.1
+    viem: ^2.21.55
+  checksum: b64a73e0c81de1928f6a1b4aeec5f31183db8c62323811a520d54c752fb94e7a44f1c8b0363cc111b1df1223a489fd4e6e61303dcd0efe472c8010e1206c5e34
   languageName: node
   linkType: hard
 

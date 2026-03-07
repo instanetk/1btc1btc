@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import Script from "next/script";
 import { Inter } from "next/font/google";
 import { tickerFont } from "@/lib/fonts";
-import { Providers } from "./providers";
 import "@coinbase/onchainkit/styles.css";
 import "./globals.css";
 
@@ -58,7 +57,7 @@ export default function RootLayout({
             })();
           `}</Script>
         )}
-        <Providers>{children}</Providers>
+        {children}
       </body>
     </html>
   );

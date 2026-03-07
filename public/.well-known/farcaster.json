@@ -1,0 +1,23 @@
+{
+  "accountAssociation": {
+    "header": "PLACEHOLDER",
+    "payload": "PLACEHOLDER",
+    "signature": "PLACEHOLDER"
+  },
+  "miniapp": {
+    "version": "1",
+    "name": "1BTC1BTC",
+    "homeUrl": "https://1btc1btc.money/frame",
+    "iconUrl": "https://1btc1btc.money/logo.png",
+    "splashImageUrl": "https://1btc1btc.money/splash.png",
+    "splashBackgroundColor": "#0A0A0A",
+    "subtitle": "1 BTC = 1 BTC",
+    "description": "Generate Bitcoin zen koans and mint them as onchain SVG NFTs on Base.",
+    "primaryCategory": "entertainment",
+    "tags": ["bitcoin", "nft", "philosophy"],
+    "requiredChains": ["eip155:8453"],
+    "ogTitle": "1BTC1BTC",
+    "ogDescription": "Generate reflections, mint them onchain.",
+    "ogImageUrl": "https://1btc1btc.money/frame-og.png"
+  }
+}
