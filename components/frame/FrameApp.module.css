@@ -1,4 +1,5 @@
 .container {
+  --ticker-height: 48px;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -28,11 +29,88 @@
 
 .actions {
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  align-items: stretch;
   gap: 8px;
-  flex-wrap: wrap;
-  justify-content: center;
+  width: 100%;
   flex-shrink: 0;
+}
+
+.termsModal {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 16px;
+}
+
+.termsContent {
+  background: #111;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 20px;
+  max-height: 80vh;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  width: 100%;
+  max-width: 400px;
+}
+
+.termsHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.termsTitle {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-text);
+  margin: 0;
+}
+
+.termsClose {
+  background: none;
+  border: none;
+  color: var(--color-text-muted);
+  font-size: 1.25rem;
+  cursor: pointer;
+  padding: 4px;
+  line-height: 1;
+}
+
+.termsBody {
+  font-size: 0.75rem;
+  line-height: 1.7;
+  color: var(--color-text-muted);
+}
+
+.termsBody p {
+  margin: 0 0 12px;
+}
+
+.termsBody h1,
+.termsBody h2,
+.termsBody h3 {
+  color: var(--color-text);
+  font-size: 0.8125rem;
+  margin: 16px 0 8px;
+}
+
+.termsBody ul,
+.termsBody ol {
+  padding-left: 20px;
+  margin: 0 0 12px;
+}
+
+.termsBody a {
+  color: var(--color-accent);
 }
 
 .error {

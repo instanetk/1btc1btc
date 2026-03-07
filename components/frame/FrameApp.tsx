@@ -1,5 +1,5 @@
 "use client";
-import { useState, useCallback, useMemo, useRef } from "react";
+import { useState, useCallback, useRef } from "react";
 import Image from "next/image";
 import { AnalogyDisplay } from "@/components/AnalogyDisplay";
 import { GenerateButton } from "@/components/GenerateButton";
@@ -9,7 +9,33 @@ import { FrameGallery } from "@/components/frame/FrameGallery";
 import { OrbitalBackground } from "@/components/OrbitalBackground";
 import { ProgressBar } from "@/components/ProgressBar";
 import { Ticker } from "@/components/Ticker";
+import TOS_MD from "@/terms-of-service.md";
 import styles from "./FrameApp.module.css";
+
+/** Minimal markdown renderer for TOS */
+function renderMarkdown(md: string) {
+  const lines = md.split("\n");
+  const elements: React.ReactNode[] = [];
+  let key = 0;
+
+  for (const line of lines) {
+    if (line.startsWith("# ")) {
+      elements.push(<h1 key={key++}>{line.slice(2)}</h1>);
+    } else if (line.startsWith("## ")) {
+      elements.push(<h2 key={key++}>{line.slice(3)}</h2>);
+    } else if (line.startsWith("### ")) {
+      elements.push(<h3 key={key++}>{line.slice(4)}</h3>);
+    } else if (line.startsWith("- ")) {
+      elements.push(<li key={key++}>{line.slice(2)}</li>);
+    } else if (line.trim() === "") {
+      continue;
+    } else {
+      elements.push(<p key={key++}>{line}</p>);
+    }
+  }
+
+  return elements;
+}
 
 export function FrameApp() {
   const [analogy, setAnalogy] = useState<string | null>(null);
@@ -18,15 +44,12 @@ export function FrameApp() {
   const [generateError, setGenerateError] = useState<string | null>(null);
   const [mintedAnalogy, setMintedAnalogy] = useState<string | null>(null);
   const [mintVisible, setMintVisible] = useState(false);
+  const [termsOpen, setTermsOpen] = useState(false);
   const hasGeneratedRef = useRef(false);
-  const siteUrl = useMemo(
-    () => process.env.NEXT_PUBLIC_SITE_URL ?? "https://1btc1btc.money",
-    []
-  );
 
   const handleOpenTerms = useCallback(() => {
-    window.open(`${siteUrl}/#terms`, "_blank");
-  }, [siteUrl]);
+    setTermsOpen(true);
+  }, []);
 
   const handleGenerate = useCallback(async () => {
     setIsGenerating(true);
@@ -114,6 +137,30 @@ export function FrameApp() {
       <FrameGallery />
 
       <Ticker />
+
+      {termsOpen && (
+        <div
+          className={styles.termsModal}
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setTermsOpen(false);
+          }}
+        >
+          <div className={styles.termsContent}>
+            <div className={styles.termsHeader}>
+              <h2 className={styles.termsTitle}>Terms of Service</h2>
+              <button
+                className={styles.termsClose}
+                onClick={() => setTermsOpen(false)}
+              >
+                ×
+              </button>
+            </div>
+            <div className={styles.termsBody}>
+              {renderMarkdown(TOS_MD)}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
