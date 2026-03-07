@@ -1,11 +1,14 @@
 "use client";
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useMemo, useRef } from "react";
 import Image from "next/image";
 import { AnalogyDisplay } from "@/components/AnalogyDisplay";
 import { GenerateButton } from "@/components/GenerateButton";
 import { MintButton } from "@/components/MintButton";
 import { FrameShareButton } from "@/components/frame/FrameShareButton";
 import { FrameGallery } from "@/components/frame/FrameGallery";
+import { OrbitalBackground } from "@/components/OrbitalBackground";
+import { ProgressBar } from "@/components/ProgressBar";
+import { Ticker } from "@/components/Ticker";
 import styles from "./FrameApp.module.css";
 
 export function FrameApp() {
@@ -16,6 +19,14 @@ export function FrameApp() {
   const [mintedAnalogy, setMintedAnalogy] = useState<string | null>(null);
   const [mintVisible, setMintVisible] = useState(false);
   const hasGeneratedRef = useRef(false);
+  const siteUrl = useMemo(
+    () => process.env.NEXT_PUBLIC_SITE_URL ?? "https://1btc1btc.money",
+    []
+  );
+
+  const handleOpenTerms = useCallback(() => {
+    window.open(`${siteUrl}/#terms`, "_blank");
+  }, [siteUrl]);
 
   const handleGenerate = useCallback(async () => {
     setIsGenerating(true);
@@ -57,6 +68,8 @@ export function FrameApp() {
 
   return (
     <div className={styles.container}>
+      <ProgressBar />
+      <OrbitalBackground />
       <Image
         src="/logo.png"
         alt="1BTC=1BTC"
@@ -90,7 +103,7 @@ export function FrameApp() {
               analogy={analogy}
               analogyId={analogyId}
               onSuccess={handleMintSuccess}
-              compact
+              onOpenTerms={handleOpenTerms}
             />
           </div>
         )}
@@ -99,6 +112,8 @@ export function FrameApp() {
       {mintedAnalogy && <FrameShareButton analogy={mintedAnalogy} />}
 
       <FrameGallery />
+
+      <Ticker />
     </div>
   );
 }
