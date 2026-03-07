@@ -68,7 +68,7 @@
 @keyframes flashGreen {
   0%, 40% {
     color: #00ff64;
-    text-shadow: 0 0 12px rgba(0, 255, 100, 0.9), 0 0 24px rgba(0, 255, 100, 0.4);
+    text-shadow: 0 0 3px rgba(0, 255, 100, 0.5);
   }
   100% {
     color: var(--color-accent);
@@ -79,7 +79,7 @@
 @keyframes flashRed {
   0%, 40% {
     color: #ff4444;
-    text-shadow: 0 0 12px rgba(255, 68, 68, 0.9), 0 0 24px rgba(255, 68, 68, 0.4);
+    text-shadow: 0 0 3px rgba(255, 68, 68, 0.5);
   }
   100% {
     color: var(--color-accent);
