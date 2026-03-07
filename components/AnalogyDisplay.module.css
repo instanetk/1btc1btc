@@ -2,10 +2,40 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 120px;
-  max-width: 640px;
+  min-height: 200px;
+  max-width: 720px;
   width: 100%;
-  padding: 0 1rem;
+  padding: 2.5rem 2rem;
+  border-radius: 16px;
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+  transition: opacity 600ms ease-out,
+              background-color 600ms ease-out,
+              border-color 600ms ease-out;
+}
+
+.halo {
+  background: rgba(255, 255, 255, 0.015);
+  border: 1px solid rgba(255, 255, 255, 0.03);
+  opacity: 0.7;
+}
+
+.card {
+  background: rgba(255, 255, 255, 0.01);
+  border: 1px solid rgba(255, 255, 255, 0.03);
+  opacity: 1;
+}
+
+.provocation {
+  font-family: Georgia, serif;
+  font-size: clamp(1.25rem, 3vw, 1.75rem);
+  font-weight: 400;
+  line-height: 1.6;
+  text-align: center;
+  color: var(--color-text);
+  font-style: italic;
+  max-width: 640px;
+  transition: opacity 1s ease-in-out;
 }
 
 .analogy {
@@ -15,17 +45,7 @@
   line-height: 1.6;
   text-align: center;
   color: var(--color-text);
-  animation: fadeIn 1.5s ease-out;
-}
-
-.placeholder {
-  font-family: Georgia, serif;
-  font-size: clamp(1.25rem, 3vw, 1.75rem);
-  font-weight: 400;
-  line-height: 1.6;
-  text-align: center;
-  color: var(--color-text-muted);
-  font-style: italic;
+  transition: opacity 800ms ease-in;
 }
 
 .spinner {

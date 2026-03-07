@@ -1,5 +1,5 @@
 "use client";
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef } from "react";
 import Image from "next/image";
 import { OrbitalBackground } from "@/components/OrbitalBackground";
 import { AnalogyDisplay } from "@/components/AnalogyDisplay";
@@ -19,9 +19,11 @@ export default function Home() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [generateError, setGenerateError] = useState<string | null>(null);
   const [mintSuccess, setMintSuccess] = useState<string | null>(null);
+  const [mintVisible, setMintVisible] = useState(false);
   const [walletModalOpen, setWalletModalOpen] = useState(false);
   const [infoSidebarOpen, setInfoSidebarOpen] = useState(false);
   const [galleryRefreshKey, setGalleryRefreshKey] = useState(0);
+  const hasGeneratedRef = useRef(false);
 
   const openWalletModal = useCallback(() => setWalletModalOpen(true), []);
   const closeWalletModal = useCallback(() => setWalletModalOpen(false), []);
@@ -30,10 +32,13 @@ export default function Home() {
 
   const handleGenerate = useCallback(async () => {
     setIsGenerating(true);
-    setAnalogy(null);
-    setAnalogyId(null);
     setGenerateError(null);
     setMintSuccess(null);
+    // Only clear analogy on first generation — subsequent keeps card visible
+    if (!hasGeneratedRef.current) {
+      setAnalogy(null);
+      setAnalogyId(null);
+    }
 
     try {
       const response = await fetch("/api/generate", { method: "POST" });
@@ -42,6 +47,7 @@ export default function Home() {
         throw new Error(data.error || "Failed to generate");
       }
       const data = await response.json();
+      hasGeneratedRef.current = true;
       setAnalogy(data.analogy);
       setAnalogyId(data.analogyId ?? null);
     } catch (error) {
@@ -87,27 +93,29 @@ export default function Home() {
           />
           <h1 className={styles.title}>1 BTC = 1 BTC</h1>
 
-          <div className={styles.thoughtBox}>
-            <AnalogyDisplay analogy={analogy} isLoading={isGenerating} />
+          <AnalogyDisplay
+            analogy={analogy}
+            isLoading={isGenerating}
+            onTextVisible={setMintVisible}
+          />
 
-            {generateError && (
-              <p className={styles.errorText}>{generateError}</p>
-            )}
+          {generateError && (
+            <p className={styles.errorText}>{generateError}</p>
+          )}
 
-            {mintSuccess && (
-              <p className={styles.mintToast}>
-                This thought now lives forever onchain.{" "}
-                <a
-                  href={`https://basescan.org/tx/${mintSuccess}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={styles.txLink}
-                >
-                  View tx &rarr;
-                </a>
-              </p>
-            )}
-          </div>
+          {mintSuccess && (
+            <p className={styles.mintToast}>
+              This thought now lives forever onchain.{" "}
+              <a
+                href={`https://basescan.org/tx/${mintSuccess}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={styles.txLink}
+              >
+                View tx &rarr;
+              </a>
+            </p>
+          )}
 
           <div className={styles.buttons}>
             <GenerateButton
@@ -115,13 +123,20 @@ export default function Home() {
               isLoading={isGenerating}
             />
             {analogy && (
-              <MintButton
-                analogy={analogy}
-                analogyId={analogyId}
-                onSuccess={handleMintSuccess}
-                onConnect={openWalletModal}
-                onOpenTerms={openInfoSidebar}
-              />
+              <div
+                style={{
+                  opacity: mintVisible ? 1 : 0,
+                  transition: "opacity 400ms ease-in 200ms",
+                }}
+              >
+                <MintButton
+                  analogy={analogy}
+                  analogyId={analogyId}
+                  onSuccess={handleMintSuccess}
+                  onConnect={openWalletModal}
+                  onOpenTerms={openInfoSidebar}
+                />
+              </div>
             )}
           </div>
 
