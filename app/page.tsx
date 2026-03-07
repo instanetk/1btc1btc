@@ -87,7 +87,27 @@ export default function Home() {
           />
           <h1 className={styles.title}>1 BTC = 1 BTC</h1>
 
-          <AnalogyDisplay analogy={analogy} isLoading={isGenerating} />
+          <div className={styles.thoughtBox}>
+            <AnalogyDisplay analogy={analogy} isLoading={isGenerating} />
+
+            {generateError && (
+              <p className={styles.errorText}>{generateError}</p>
+            )}
+
+            {mintSuccess && (
+              <p className={styles.mintToast}>
+                This thought now lives forever onchain.{" "}
+                <a
+                  href={`https://basescan.org/tx/${mintSuccess}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={styles.txLink}
+                >
+                  View tx &rarr;
+                </a>
+              </p>
+            )}
+          </div>
 
           <div className={styles.buttons}>
             <GenerateButton
@@ -104,24 +124,6 @@ export default function Home() {
               />
             )}
           </div>
-
-          {generateError && (
-            <p className={styles.errorText}>{generateError}</p>
-          )}
-
-          {mintSuccess && (
-            <p className={styles.mintToast}>
-              This thought now lives forever onchain.{" "}
-              <a
-                href={`https://basescan.org/tx/${mintSuccess}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={styles.txLink}
-              >
-                View tx &rarr;
-              </a>
-            </p>
-          )}
 
         </div>
 
