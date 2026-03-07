@@ -11,22 +11,13 @@ export default function FramePage() {
   const { connect, connectors } = useConnect();
   const { isConnected } = useAccount();
 
-  // Init SDK and call ready() immediately — don't gate on wallet
+  // Call ready() as soon as possible to dismiss splash screen
   useEffect(() => {
     if (initRef.current) return;
     initRef.current = true;
 
-    const init = async () => {
-      try {
-        await sdk.context;
-        await sdk.actions.ready();
-      } catch (err) {
-        console.error("Farcaster SDK init failed:", err);
-      } finally {
-        setIsSDKReady(true);
-      }
-    };
-    init();
+    sdk.actions.ready().catch(() => {});
+    setIsSDKReady(true);
   }, []);
 
   // Auto-connect wallet separately
