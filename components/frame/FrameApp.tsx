@@ -2,15 +2,19 @@
 import { useState, useCallback, useEffect, useRef } from "react";
 import Image from "next/image";
 import { sdk } from "@farcaster/miniapp-sdk";
+import { useReadContract } from "wagmi";
 import { AnalogyDisplay } from "@/components/AnalogyDisplay";
 import { GenerateButton } from "@/components/GenerateButton";
 import { MintButton } from "@/components/MintButton";
 import { FrameShareButton } from "@/components/frame/FrameShareButton";
+import { FrameUpvoteButton } from "@/components/frame/FrameUpvoteButton";
 import { FrameGallery } from "@/components/frame/FrameGallery";
 import { FrameNotificationPrompt } from "@/components/frame/FrameNotificationPrompt";
 import { OrbitalBackground } from "@/components/OrbitalBackground";
 import { ProgressBar } from "@/components/ProgressBar";
 import { Ticker } from "@/components/Ticker";
+import { ONEBTC_ABI } from "@/lib/contract";
+import { CONTRACT_ADDRESS } from "@/lib/constants";
 import ABOUT_MD from "@/about.md";
 import TOS_MD from "@/terms-of-service.md";
 import styles from "./FrameApp.module.css";
@@ -40,7 +44,11 @@ function renderMarkdown(md: string) {
   return elements;
 }
 
-export function FrameApp() {
+interface FrameAppProps {
+  initialTokenId?: number;
+}
+
+export function FrameApp({ initialTokenId }: FrameAppProps = {}) {
   const [analogy, setAnalogy] = useState<string | null>(null);
   const [analogyId, setAnalogyId] = useState<string | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -53,6 +61,23 @@ export function FrameApp() {
   const [showNotificationPrompt, setShowNotificationPrompt] = useState(false);
   const [fid, setFid] = useState<number | undefined>();
   const hasGeneratedRef = useRef(false);
+
+  // Fetch featured token analogy from contract when deep-linked
+  const { data: featuredAnalogy } = useReadContract({
+    address: CONTRACT_ADDRESS as `0x${string}`,
+    abi: ONEBTC_ABI,
+    functionName: "analogies",
+    args: initialTokenId ? [BigInt(initialTokenId)] : undefined,
+    query: { enabled: !!initialTokenId },
+  });
+
+  const { data: featuredUpvotes } = useReadContract({
+    address: CONTRACT_ADDRESS as `0x${string}`,
+    abi: ONEBTC_ABI,
+    functionName: "upvotes",
+    args: initialTokenId ? [BigInt(initialTokenId)] : undefined,
+    query: { enabled: !!initialTokenId },
+  });
 
   // Read Farcaster user FID from SDK context
   useEffect(() => {
@@ -146,6 +171,24 @@ export function FrameApp() {
       />
 
       <h1 className={styles.title}>1 BTC = 1 BTC</h1>
+
+      {initialTokenId && featuredAnalogy && (
+        <div className={styles.featuredThought}>
+          <span className={styles.featuredLabel}>Thought #{initialTokenId}</span>
+          <p className={styles.featuredText}>{featuredAnalogy as string}</p>
+          <div className={styles.featuredActions}>
+            <FrameUpvoteButton
+              tokenId={initialTokenId}
+              currentUpvotes={Number(featuredUpvotes ?? 0)}
+            />
+            <FrameShareButton
+              analogy={featuredAnalogy as string}
+              tokenId={initialTokenId}
+              compact
+            />
+          </div>
+        </div>
+      )}
 
       <AnalogyDisplay
         analogy={analogy}

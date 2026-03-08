@@ -126,6 +126,12 @@
   opacity: 0.8;
 }
 
+.cardActions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
 .viewFullGallery {
   display: block;
   text-align: center;

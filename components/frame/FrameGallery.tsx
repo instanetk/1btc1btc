@@ -2,6 +2,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { sdk } from "@farcaster/miniapp-sdk";
 import { FrameUpvoteButton } from "./FrameUpvoteButton";
+import { FrameShareButton } from "./FrameShareButton";
 import styles from "./FrameGallery.module.css";
 
 type SortMode = "top" | "newest";
@@ -141,10 +142,15 @@ export function FrameGallery() {
               <span className={styles.minter}>
                 {item.minter.slice(0, 6)}...{item.minter.slice(-4)}
               </span>
-              <div onClick={(e) => e.stopPropagation()}>
+              <div className={styles.cardActions} onClick={(e) => e.stopPropagation()}>
                 <FrameUpvoteButton
                   tokenId={item.tokenId}
                   currentUpvotes={item.upvotes}
+                />
+                <FrameShareButton
+                  analogy={item.analogy}
+                  tokenId={item.tokenId}
+                  compact
                 />
               </div>
             </div>

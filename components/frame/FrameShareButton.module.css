@@ -16,6 +16,22 @@
   background: rgba(247, 147, 26, 0.1);
 }
 
+.button.compact {
+  padding: 3px 6px;
+  border-color: rgba(255, 255, 255, 0.15);
+  border-radius: 6px;
+  color: #888;
+  font-size: 0.6875rem;
+  animation: none;
+  display: flex;
+  align-items: center;
+}
+
+.button.compact:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
 @keyframes fadeIn {
   from {
     opacity: 0;

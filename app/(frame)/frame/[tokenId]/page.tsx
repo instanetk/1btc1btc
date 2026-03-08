@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import FrameTokenPage from "./FrameTokenPage";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://1btc1btc.money";
 
@@ -15,7 +16,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       action: {
         type: "launch_frame",
         name: "1BTC1BTC",
-        url: `${SITE_URL}/frame`,
+        url: `${SITE_URL}/frame/${tokenId}`,
         splashImageUrl: `${SITE_URL}/splash.png`,
         splashBackgroundColor: "#0A0A0A",
       },
@@ -32,5 +33,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-// Re-export the main frame page — same Mini App UI, different metadata
-export { default } from "../page";
+export default function Page() {
+  return <FrameTokenPage />;
+}
