@@ -1,17 +1,21 @@
 .card {
-  background: rgba(0, 0, 0, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.01);
+  border: 1px solid rgba(255, 255, 255, 0.03);
+  border-radius: 16px;
   padding: 1.25rem;
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  transition: box-shadow 0.2s ease;
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+  transition: background-color 600ms ease-out,
+              border-color 600ms ease-out,
+              box-shadow 0.2s ease;
   min-width: 0;
 }
 
 .card:hover {
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 2px 12px rgba(255, 255, 255, 0.05);
 }
 
 .analogy {
@@ -39,8 +43,8 @@
 .mintedOverlay {
   position: absolute;
   inset: 0;
-  background: rgba(0, 0, 0, 0.6);
-  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.5);
+  border-radius: 16px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -62,7 +66,7 @@
 .domain {
   font-size: 0.75rem;
   color: rgba(255, 255, 255, 0.5);
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.06);
   padding: 0.15rem 0.5rem;
   border-radius: 9999px;
   overflow: hidden;
