@@ -34,13 +34,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       openGraph: {
         title: `1BTC1BTC #${tokenId}`,
         description,
-        images: [{ url: `/api/og/${tokenId}`, width: 1200, height: 1200 }],
+        images: [{ url: `/api/og/feed/${tokenId}`, width: 1200, height: 630 }],
       },
       twitter: {
         card: "summary_large_image",
         title: `1BTC1BTC #${tokenId}`,
         description,
-        images: [{ url: `/api/og/${tokenId}`, alt: description }],
+        images: [{ url: `/api/og/feed/${tokenId}`, alt: description }],
       },
     };
   } catch {
