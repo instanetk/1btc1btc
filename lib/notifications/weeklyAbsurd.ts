@@ -1,47 +1,18 @@
+import {
+  liveConversions,
+  historicalConversions,
+  absurdConversions,
+  type ConversionDef,
+} from "@/lib/ticker/conversions";
 import { broadcastNotification } from "./send";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://1btc1btc.money";
 
-const ABSURD_TEMPLATES = [
-  { unit: "cows", compute: (btcUsd: number) => Math.round(btcUsd / 2500) },
-  {
-    unit: "Big Macs",
-    compute: (btcUsd: number) => Math.round(btcUsd / 5.79),
-  },
-  {
-    unit: "Costco hot dogs",
-    compute: (btcUsd: number) => Math.round(btcUsd / 1.5),
-  },
-  {
-    unit: "gallons of milk",
-    compute: (btcUsd: number) => Math.round(btcUsd / 4.15),
-  },
-  { unit: "bananas", compute: (btcUsd: number) => Math.round(btcUsd / 0.25) },
-  {
-    unit: "oz of gold",
-    compute: (btcUsd: number) => Math.round((btcUsd / 2650) * 10) / 10,
-  },
-  {
-    unit: "beaver pelts",
-    compute: (btcUsd: number) => Math.round(btcUsd / 2),
-  },
-  {
-    unit: "tulip bulbs (1637)",
-    compute: (btcUsd: number) => Math.round((btcUsd / 15000) * 10) / 10,
-  },
-  {
-    unit: "Roman soldier salaries",
-    compute: (btcUsd: number) => Math.round((btcUsd / 2000) * 10) / 10,
-  },
-  {
-    unit: "copies of the whitepaper",
-    compute: (btcUsd: number) => Math.round(btcUsd / 0.9),
-  },
-  {
-    unit: "million grains of rice",
-    compute: (btcUsd: number) =>
-      Math.round(btcUsd / 0.0004 / 1_000_000),
-  },
+// All conversion categories combined into one pool for weekly rotation
+const ALL_CONVERSIONS: ConversionDef[] = [
+  ...liveConversions,
+  ...historicalConversions,
+  ...absurdConversions,
 ];
 
 function getWeekId(): string {
@@ -64,6 +35,13 @@ function hashToIndex(str: string, max: number): number {
     hash |= 0;
   }
   return Math.abs(hash) % max;
+}
+
+function formatValue(n: number): string {
+  if (n >= 1_000_000) return (n / 1_000_000).toFixed(1) + "M";
+  if (n >= 1_000) return Math.round(n).toLocaleString("en-US");
+  if (n >= 10) return Math.round(n).toString();
+  return n.toFixed(1);
 }
 
 async function getBtcPrice(): Promise<number | null> {
@@ -91,14 +69,17 @@ export async function sendWeeklyAbsurd() {
     console.log(`[WeeklyAbsurd] BTC/USD: $${btcUsd}`);
 
     const weekId = getWeekId();
-    const index = hashToIndex(weekId, ABSURD_TEMPLATES.length);
-    const template = ABSURD_TEMPLATES[index];
-    const value = template.compute(btcUsd);
+    const index = hashToIndex(weekId, ALL_CONVERSIONS.length);
+    const conversion = ALL_CONVERSIONS[index];
+    const raw = conversion.compute(btcUsd);
+    const value = formatValue(raw);
 
-    console.log(`[WeeklyAbsurd] This week: 1 BTC = ${value} ${template.unit}`);
+    console.log(
+      `[WeeklyAbsurd] This week: 1 BTC = ${value} ${conversion.unit}`
+    );
 
     const result = await broadcastNotification({
-      title: `1 BTC = ${value} ${template.unit}`,
+      title: `1 BTC = ${value} ${conversion.unit}`,
       body: "Think about it.",
       targetUrl: `${SITE_URL}/frame`,
       notificationId: `absurd-${weekId}`,
