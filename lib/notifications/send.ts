@@ -19,11 +19,13 @@ export async function sendNotification({
   title,
   body,
   targetUrl,
+  notificationId,
 }: {
   fid: number;
   title: string;
   body: string;
   targetUrl: string;
+  notificationId?: string;
 }): Promise<SendResult> {
   await connectToDatabase();
 
@@ -34,7 +36,7 @@ export async function sendNotification({
 
   try {
     const payload: SendNotificationRequest = {
-      notificationId: crypto.randomUUID(),
+      notificationId: notificationId ?? crypto.randomUUID(),
       title: title.slice(0, 32),
       body: body.slice(0, 128),
       targetUrl,

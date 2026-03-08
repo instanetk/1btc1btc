@@ -12,6 +12,7 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://1btc1btc.money";
 const NOTIFICATION_COOLDOWN_MS = 60 * 60 * 1000; // 1 hour
 const POLL_INTERVAL_MS = 10_000;
 const RESTART_DELAY_MS = 5_000;
+const MILESTONES = [10, 25, 50, 100, 250, 500, 1000];
 
 function createWatcher() {
   const client = createPublicClient({
@@ -70,27 +71,54 @@ function createWatcher() {
             continue;
           }
 
+          // --- Upvote notification (rate limited) ---
+          let rateLimited = false;
           if (token.lastNotifiedAt) {
             const elapsed =
               Date.now() - new Date(token.lastNotifiedAt).getTime();
             if (elapsed < NOTIFICATION_COOLDOWN_MS) {
-              console.log("[UpvoteListener] Rate limited, skipping");
-              continue;
+              console.log("[UpvoteListener] Upvote notification rate limited, skipping");
+              rateLimited = true;
             }
           }
 
-          await NotificationToken.updateOne(
-            { fid: analogy.minterFid },
-            { lastNotifiedAt: new Date() }
-          );
+          if (!rateLimited) {
+            await NotificationToken.updateOne(
+              { fid: analogy.minterFid },
+              { lastNotifiedAt: new Date() }
+            );
 
-          const result = await sendNotification({
-            fid: analogy.minterFid,
-            title: "Your thought got upvoted!",
-            body: `Thought #${tokenId} was upvoted ₿`,
-            targetUrl: `${SITE_URL}/frame`,
+            const result = await sendNotification({
+              fid: analogy.minterFid,
+              title: "Your thought got upvoted!",
+              body: `Thought #${tokenId} was upvoted ₿`,
+              targetUrl: `${SITE_URL}/frame`,
+            });
+            console.log("[UpvoteListener] Upvote notification result:", result);
+          }
+
+          // --- Milestone notification (bypasses rate limit) ---
+          const currentVotes = await client.readContract({
+            address: CONTRACT_ADDRESS,
+            abi: ONEBTC_ABI,
+            functionName: "upvotes",
+            args: [tokenId],
           });
-          console.log("[UpvoteListener] Notification result:", result);
+          const voteCount = Number(currentVotes);
+          console.log(`[UpvoteListener] Token #${tokenId} now has ${voteCount} votes`);
+
+          if (MILESTONES.includes(voteCount)) {
+            console.log(`[UpvoteListener] Milestone hit: token #${tokenId} reached ${voteCount} upvotes`);
+
+            const milestoneResult = await sendNotification({
+              fid: analogy.minterFid,
+              title: `${voteCount} upvotes ₿`,
+              body: `Your thought #${tokenId} just hit ${voteCount} △`,
+              targetUrl: `${SITE_URL}/frame`,
+              notificationId: `milestone-${tokenId}-${voteCount}`,
+            });
+            console.log("[UpvoteListener] Milestone notification result:", milestoneResult);
+          }
         } catch (error) {
           console.error("[UpvoteListener] Error processing upvote:", error);
         }
