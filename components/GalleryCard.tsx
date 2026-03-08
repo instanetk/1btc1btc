@@ -32,11 +32,13 @@ export function GalleryCard({ item, onUpvoteSuccess }: GalleryCardProps) {
             </Identity>
             <span className={styles.mintNumber}>#{item.tokenId.toString()}</span>
           </div>
-          <UpvoteButton
-            tokenId={item.tokenId}
-            currentUpvotes={item.upvotes}
-            onSuccess={onUpvoteSuccess}
-          />
+          <div onClick={(e) => e.stopPropagation()}>
+            <UpvoteButton
+              tokenId={item.tokenId}
+              currentUpvotes={item.upvotes}
+              onSuccess={onUpvoteSuccess}
+            />
+          </div>
         </div>
       </div>
       {showNft && (
