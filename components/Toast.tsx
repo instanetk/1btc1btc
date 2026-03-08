@@ -1,4 +1,5 @@
 "use client";
+import { createPortal } from "react-dom";
 import styles from "./Toast.module.css";
 
 interface ToastProps {
@@ -7,7 +8,7 @@ interface ToastProps {
 }
 
 export function Toast({ message, onClose }: ToastProps) {
-  return (
+  return createPortal(
     <div className={styles.toast}>
       <svg className={styles.icon} viewBox="0 0 111 111" xmlns="http://www.w3.org/2000/svg">
         <rect width="111" height="111" rx="5.55" fill="#0000FF" />
@@ -16,6 +17,7 @@ export function Toast({ message, onClose }: ToastProps) {
       <button className={styles.close} onClick={onClose}>
         ✕
       </button>
-    </div>
+    </div>,
+    document.body
   );
 }
