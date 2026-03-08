@@ -68,7 +68,7 @@ export async function sendWeeklyTopThought() {
     const result = await broadcastNotification({
       title: "Top thought this week",
       body: `"${truncatedText}"`,
-      targetUrl: `${SITE_URL}/frame`,
+      targetUrl: `${SITE_URL}/frame/${topThought.tokenId}`,
       notificationId: `weekly-top-${weekId}`,
     });
 
