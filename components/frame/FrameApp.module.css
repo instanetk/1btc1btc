@@ -11,6 +11,29 @@
   -webkit-overflow-scrolling: touch;
 }
 
+.infoButton {
+  position: fixed;
+  top: 52px;
+  left: 12px;
+  z-index: 100;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--color-text-muted);
+  transition: all 0.2s ease;
+}
+
+.infoButton:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--color-text);
+}
+
 .logo {
   width: 48px;
   height: auto;

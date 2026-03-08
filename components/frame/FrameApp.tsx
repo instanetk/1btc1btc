@@ -9,6 +9,7 @@ import { FrameGallery } from "@/components/frame/FrameGallery";
 import { OrbitalBackground } from "@/components/OrbitalBackground";
 import { ProgressBar } from "@/components/ProgressBar";
 import { Ticker } from "@/components/Ticker";
+import ABOUT_MD from "@/about.md";
 import TOS_MD from "@/terms-of-service.md";
 import styles from "./FrameApp.module.css";
 
@@ -45,6 +46,7 @@ export function FrameApp() {
   const [mintedAnalogy, setMintedAnalogy] = useState<string | null>(null);
   const [mintVisible, setMintVisible] = useState(false);
   const [termsOpen, setTermsOpen] = useState(false);
+  const [aboutOpen, setAboutOpen] = useState(false);
   const hasGeneratedRef = useRef(false);
 
   const handleOpenTerms = useCallback(() => {
@@ -93,6 +95,18 @@ export function FrameApp() {
     <div className={styles.container}>
       <ProgressBar />
       <OrbitalBackground />
+
+      <button
+        className={styles.infoButton}
+        onClick={() => setAboutOpen(true)}
+        aria-label="About & Terms"
+      >
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="12" cy="12" r="10" />
+          <line x1="12" y1="16" x2="12" y2="12" />
+          <line x1="12" y1="8" x2="12.01" y2="8" />
+        </svg>
+      </button>
       <Image
         src="/logo.png"
         alt="1BTC=1BTC"
@@ -137,6 +151,30 @@ export function FrameApp() {
       <FrameGallery />
 
       <Ticker />
+
+      {aboutOpen && (
+        <div
+          className={styles.termsModal}
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setAboutOpen(false);
+          }}
+        >
+          <div className={styles.termsContent}>
+            <div className={styles.termsHeader}>
+              <h2 className={styles.termsTitle}>About 1BTC1BTC</h2>
+              <button
+                className={styles.termsClose}
+                onClick={() => setAboutOpen(false)}
+              >
+                ×
+              </button>
+            </div>
+            <div className={styles.termsBody}>
+              {renderMarkdown(ABOUT_MD)}
+            </div>
+          </div>
+        </div>
+      )}
 
       {termsOpen && (
         <div
