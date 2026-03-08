@@ -7,7 +7,7 @@ import { CONTRACT_ADDRESS } from "@/lib/constants";
 
 const client = createPublicClient({
   chain: base,
-  transport: http("https://mainnet.base.org"),
+  transport: http(process.env.BASE_RPC_URL || "https://mainnet.base.org"),
 });
 
 export async function GET(

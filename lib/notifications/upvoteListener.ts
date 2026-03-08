@@ -10,27 +10,21 @@ const CONTRACT_ADDRESS = process.env
   .NEXT_PUBLIC_CONTRACT_ADDRESS as `0x${string}`;
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://1btc1btc.money";
 const NOTIFICATION_COOLDOWN_MS = 60 * 60 * 1000; // 1 hour
+const POLL_INTERVAL_MS = 10_000;
+const RESTART_DELAY_MS = 5_000;
 
-export function startUpvoteListener() {
-  if (!CONTRACT_ADDRESS || CONTRACT_ADDRESS === "0x0000000000000000000000000000000000000000") {
-    console.error("[UpvoteListener] No contract address configured, skipping");
-    return;
-  }
-
-  console.log("[UpvoteListener] Starting...");
-  console.log("[UpvoteListener] Watching contract:", CONTRACT_ADDRESS);
-
+function createWatcher() {
   const client = createPublicClient({
     chain: base,
     transport: http(process.env.BASE_RPC_URL),
-    pollingInterval: 10_000,
+    pollingInterval: POLL_INTERVAL_MS,
   });
 
-  client.watchContractEvent({
+  const unwatch = client.watchContractEvent({
     address: CONTRACT_ADDRESS,
     abi: ONEBTC_ABI,
     eventName: "Upvoted",
-    pollingInterval: 10_000,
+    pollingInterval: POLL_INTERVAL_MS,
     onLogs: async (logs) => {
       console.log(`[UpvoteListener] Received ${logs.length} event(s)`);
 
@@ -39,12 +33,9 @@ export function startUpvoteListener() {
         const voter = log.args.voter;
         if (tokenId === undefined || voter === undefined) continue;
 
-        console.log(
-          `[UpvoteListener] Upvote: token #${tokenId} by ${voter}`
-        );
+        console.log(`[UpvoteListener] Upvote: token #${tokenId} by ${voter}`);
 
         try {
-          // Look up the minter from MongoDB
           await connectToDatabase();
           const analogy = await Analogy.findOne({
             tokenId: Number(tokenId),
@@ -56,7 +47,6 @@ export function startUpvoteListener() {
             continue;
           }
 
-          // Skip self-upvotes
           if (
             analogy.minterAddress &&
             voter.toLowerCase() === analogy.minterAddress.toLowerCase()
@@ -70,7 +60,6 @@ export function startUpvoteListener() {
             continue;
           }
 
-          // Rate limit: max 1 notification per hour per user
           const token = await NotificationToken.findOne({
             fid: analogy.minterFid,
             enabled: true,
@@ -90,7 +79,6 @@ export function startUpvoteListener() {
             }
           }
 
-          // Update lastNotifiedAt before sending (optimistic)
           await NotificationToken.updateOne(
             { fid: analogy.minterFid },
             { lastNotifiedAt: new Date() }
@@ -109,9 +97,30 @@ export function startUpvoteListener() {
       }
     },
     onError: (error) => {
-      console.error("[UpvoteListener] watchEvent error:", error);
+      const msg = error instanceof Error ? error.message : String(error);
+
+      // Filter expired or not supported — restart the watcher
+      if (msg.includes("filter not found") || msg.includes("eth_getFilterChanges")) {
+        console.warn("[UpvoteListener] Filter expired, restarting in", RESTART_DELAY_MS / 1000, "s...");
+        unwatch();
+        setTimeout(createWatcher, RESTART_DELAY_MS);
+      } else {
+        console.error("[UpvoteListener] watchEvent error:", error);
+      }
     },
   });
+}
 
-  console.log("[UpvoteListener] Watching for Upvoted events...");
+export function startUpvoteListener() {
+  if (!CONTRACT_ADDRESS || CONTRACT_ADDRESS === "0x0000000000000000000000000000000000000000") {
+    console.error("[UpvoteListener] No contract address configured, skipping");
+    return;
+  }
+
+  console.log("[UpvoteListener] Starting...");
+  console.log("[UpvoteListener] Watching contract:", CONTRACT_ADDRESS);
+
+  createWatcher();
+
+  console.log(`[UpvoteListener] Polling every ${POLL_INTERVAL_MS / 1000}s for Upvoted events`);
 }

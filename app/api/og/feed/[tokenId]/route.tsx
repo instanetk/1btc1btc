@@ -1,8 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import { keccak256, encodePacked } from "viem";
+import { createPublicClient, http, keccak256, encodePacked } from "viem";
+import { base } from "viem/chains";
 import sharp from "sharp";
 import { connectToDatabase } from "@/lib/mongodb";
 import { Analogy } from "@/lib/models/Analogy";
+import { ONEBTC_ABI } from "@/lib/contract";
+import { CONTRACT_ADDRESS } from "@/lib/constants";
 
 // Layout constants for 1200x630 OG image
 const W = 1200;
@@ -150,35 +153,69 @@ function buildSvg(tokenId: number, text: string): string {
   );
 }
 
+async function renderFromMongo(id: number): Promise<Buffer> {
+  await connectToDatabase();
+  const doc = await Analogy.findOne({ tokenId: id, minted: true }).lean();
+
+  if (!doc) {
+    throw new Error(`Token #${id} not found in MongoDB`);
+  }
+
+  const svg = buildSvg(id, doc.text as string);
+  return sharp(Buffer.from(svg)).png().toBuffer();
+}
+
+async function renderFromContract(id: number): Promise<Buffer> {
+  const rpcUrl = process.env.BASE_RPC_URL || "https://mainnet.base.org";
+  const client = createPublicClient({
+    chain: base,
+    transport: http(rpcUrl),
+  });
+
+  const uri = (await client.readContract({
+    address: CONTRACT_ADDRESS as `0x${string}`,
+    abi: ONEBTC_ABI,
+    functionName: "tokenURI",
+    args: [BigInt(id)],
+  })) as string;
+
+  const json = JSON.parse(atob(uri.split(",")[1]));
+  const svgBuffer = Buffer.from((json.image as string).split(",")[1], "base64");
+  return sharp(svgBuffer).resize(1200, 1200).png().toBuffer();
+}
+
 export async function GET(
   _req: NextRequest,
   { params }: { params: Promise<{ tokenId: string }> }
 ) {
+  const { tokenId } = await params;
+  const id = parseInt(tokenId, 10);
+
+  if (isNaN(id) || id < 0) {
+    return new Response("Invalid tokenId", { status: 400 });
+  }
+
+  let pngBuffer: Buffer;
+
   try {
-    const { tokenId } = await params;
-    const id = parseInt(tokenId, 10);
+    pngBuffer = await renderFromMongo(id);
+  } catch (mongoErr) {
+    console.error(`[OG/feed] MongoDB render failed for #${id}:`, mongoErr);
 
-    if (isNaN(id) || id < 0) {
-      return new Response("Invalid tokenId", { status: 400 });
-    }
-
-    await connectToDatabase();
-    const doc = await Analogy.findOne({ tokenId: id, minted: true }).lean();
-
-    if (!doc) {
+    // Fallback: read on-chain SVG from contract
+    try {
+      pngBuffer = await renderFromContract(id);
+      console.log(`[OG/feed] Contract fallback succeeded for #${id}`);
+    } catch (contractErr) {
+      console.error(`[OG/feed] Contract fallback also failed for #${id}:`, contractErr);
       return new Response("Not found", { status: 404 });
     }
-
-    const svg = buildSvg(id, doc.text as string);
-    const pngBuffer = await sharp(Buffer.from(svg)).png().toBuffer();
-
-    return new NextResponse(new Uint8Array(pngBuffer), {
-      headers: {
-        "Content-Type": "image/png",
-        "Cache-Control": "public, max-age=86400, s-maxage=604800, immutable",
-      },
-    });
-  } catch {
-    return new Response("Internal server error", { status: 500 });
   }
+
+  return new NextResponse(new Uint8Array(pngBuffer), {
+    headers: {
+      "Content-Type": "image/png",
+      "Cache-Control": "public, max-age=86400, s-maxage=604800, immutable",
+    },
+  });
 }
