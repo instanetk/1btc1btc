@@ -1,11 +1,13 @@
 "use client";
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import Image from "next/image";
+import { sdk } from "@farcaster/miniapp-sdk";
 import { AnalogyDisplay } from "@/components/AnalogyDisplay";
 import { GenerateButton } from "@/components/GenerateButton";
 import { MintButton } from "@/components/MintButton";
 import { FrameShareButton } from "@/components/frame/FrameShareButton";
 import { FrameGallery } from "@/components/frame/FrameGallery";
+import { FrameNotificationPrompt } from "@/components/frame/FrameNotificationPrompt";
 import { OrbitalBackground } from "@/components/OrbitalBackground";
 import { ProgressBar } from "@/components/ProgressBar";
 import { Ticker } from "@/components/Ticker";
@@ -44,10 +46,24 @@ export function FrameApp() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [generateError, setGenerateError] = useState<string | null>(null);
   const [mintedAnalogy, setMintedAnalogy] = useState<string | null>(null);
+  const [mintedTokenId, setMintedTokenId] = useState<number | undefined>();
   const [mintVisible, setMintVisible] = useState(false);
   const [termsOpen, setTermsOpen] = useState(false);
   const [aboutOpen, setAboutOpen] = useState(false);
+  const [showNotificationPrompt, setShowNotificationPrompt] = useState(false);
+  const [fid, setFid] = useState<number | undefined>();
   const hasGeneratedRef = useRef(false);
+
+  // Read Farcaster user FID from SDK context
+  useEffect(() => {
+    sdk.context
+      .then((ctx) => {
+        if (ctx?.user?.fid) setFid(ctx.user.fid);
+      })
+      .catch(() => {
+        // SDK context not available
+      });
+  }, []);
 
   const handleOpenTerms = useCallback(() => {
     setTermsOpen(true);
@@ -83,10 +99,23 @@ export function FrameApp() {
   }, []);
 
   const handleMintSuccess = useCallback(
-    (_txHash: string) => {
+    (_txHash: string, tokenId?: number) => {
       setMintedAnalogy(analogy);
+      setMintedTokenId(tokenId);
       setAnalogy(null);
       setAnalogyId(null);
+
+      // Show notification prompt if user hasn't added the Mini App yet
+      sdk.context
+        .then((ctx) => {
+          if (!ctx?.client?.added) {
+            setShowNotificationPrompt(true);
+          }
+        })
+        .catch(() => {
+          // SDK context not available — show prompt anyway
+          setShowNotificationPrompt(true);
+        });
     },
     [analogy]
   );
@@ -141,12 +170,17 @@ export function FrameApp() {
               analogyId={analogyId}
               onSuccess={handleMintSuccess}
               onOpenTerms={handleOpenTerms}
+              minterFid={fid}
             />
           </div>
         )}
       </div>
 
-      {mintedAnalogy && <FrameShareButton analogy={mintedAnalogy} />}
+      {mintedAnalogy && (
+        <FrameShareButton analogy={mintedAnalogy} tokenId={mintedTokenId} />
+      )}
+
+      {showNotificationPrompt && <FrameNotificationPrompt />}
 
       <FrameGallery />
 

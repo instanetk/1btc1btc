@@ -10,13 +10,14 @@ import styles from "./MintButton.module.css";
 interface MintButtonProps {
   analogy: string;
   analogyId?: string | null;
-  onSuccess?: (txHash: string) => void;
+  onSuccess?: (txHash: string, tokenId?: number) => void;
   onConnect?: () => void;
   onOpenTerms?: () => void;
   compact?: boolean;
+  minterFid?: number;
 }
 
-export function MintButton({ analogy, analogyId, onSuccess, onConnect, onOpenTerms, compact }: MintButtonProps) {
+export function MintButton({ analogy, analogyId, onSuccess, onConnect, onOpenTerms, compact, minterFid }: MintButtonProps) {
   const { address, isConnected } = useAccount();
   const { priceInWei } = useMintPrice();
 
@@ -53,11 +54,10 @@ export function MintButton({ analogy, analogyId, onSuccess, onConnect, onOpenTer
   useEffect(() => {
     if (isSuccess && txHash && onSuccess && !notifiedRef.current) {
       notifiedRef.current = true;
-      onSuccess(txHash);
 
       // Fire-and-forget: update mint status in MongoDB
+      let mintedTokenId: number | undefined;
       if (analogyId && address && receipt) {
-        let tokenId: number | undefined;
         try {
           for (const log of receipt.logs) {
             try {
@@ -67,7 +67,7 @@ export function MintButton({ analogy, analogyId, onSuccess, onConnect, onOpenTer
                 topics: log.topics,
               });
               if (decoded.eventName === "AnalogyMinted") {
-                tokenId = Number((decoded.args as { tokenId: bigint }).tokenId);
+                mintedTokenId = Number((decoded.args as { tokenId: bigint }).tokenId);
                 break;
               }
             } catch {
@@ -78,7 +78,7 @@ export function MintButton({ analogy, analogyId, onSuccess, onConnect, onOpenTer
           // Log parsing failed, continue without tokenId
         }
 
-        trackEvent("Mint Success", tokenId != null ? { tokenId } : undefined);
+        trackEvent("Mint Success", mintedTokenId != null ? { tokenId: mintedTokenId } : undefined);
 
         fetch(`/api/analogies/${analogyId}/mint`, {
           method: "POST",
@@ -86,14 +86,17 @@ export function MintButton({ analogy, analogyId, onSuccess, onConnect, onOpenTer
           body: JSON.stringify({
             minterAddress: address,
             txHash,
-            ...(tokenId != null ? { tokenId } : {}),
+            ...(mintedTokenId != null ? { tokenId: mintedTokenId } : {}),
+            ...(minterFid != null ? { minterFid } : {}),
           }),
         }).catch(() => {
           // Silent failure — mint update is best-effort
         });
       }
+
+      onSuccess(txHash, mintedTokenId);
     }
-  }, [isSuccess, txHash, onSuccess, analogyId, address, receipt]);
+  }, [isSuccess, txHash, onSuccess, analogyId, address, receipt, minterFid]);
 
   const [showToast, setShowToast] = useState(false);
   useEffect(() => {

@@ -7,6 +7,7 @@ export interface IAnalogy extends Document {
   minterAddress: string | null;
   tokenId: number | null;
   txHash: string | null;
+  minterFid: number | null;
   upvotes: number;
   createdAt: Date;
   updatedAt: Date;
@@ -20,6 +21,7 @@ const AnalogySchema = new Schema<IAnalogy>(
     minterAddress: { type: String, default: null },
     tokenId: { type: Number, default: null },
     txHash: { type: String, default: null },
+    minterFid: { type: Number, default: null },
     upvotes: { type: Number, default: 0 },
   },
   { timestamps: true }

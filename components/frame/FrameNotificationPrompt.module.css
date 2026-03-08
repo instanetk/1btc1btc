@@ -1,0 +1,54 @@
+.prompt {
+  background: rgba(247, 147, 26, 0.08);
+  border: 1px solid rgba(247, 147, 26, 0.2);
+  border-radius: 10px;
+  padding: 12px;
+  text-align: center;
+  width: 100%;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.text {
+  font-size: 0.8125rem;
+  color: var(--color-text);
+  margin: 0 0 8px;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+}
+
+.enable {
+  padding: 6px 12px;
+  background: var(--color-accent);
+  color: #000;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.dismiss {
+  padding: 6px 12px;
+  background: transparent;
+  color: var(--color-text-muted);
+  border: none;
+  font-size: 0.75rem;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

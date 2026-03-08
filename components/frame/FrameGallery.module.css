@@ -3,13 +3,79 @@
   margin-top: 4px;
 }
 
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
 .heading {
   font-size: 0.75rem;
   font-weight: 500;
   color: var(--color-text-muted);
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  margin: 0 0 8px;
+  margin: 0;
+}
+
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.refreshButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  padding: 0;
+  transition: all 0.2s ease;
+}
+
+.refreshButton:hover {
+  border-color: rgba(255, 255, 255, 0.2);
+  color: var(--color-text);
+}
+
+.refreshButton:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.spinning {
+  animation: spin 0.8s linear infinite;
+}
+
+.sortToggle {
+  display: flex;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.sortTab {
+  padding: 2px 8px;
+  border: none;
+  background: transparent;
+  color: var(--color-text-muted);
+  font-size: 0.6875rem;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.2s ease;
+}
+
+.sortTab.active {
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--color-text);
 }
 
 .list {
@@ -23,6 +89,12 @@
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 10px;
   padding: 10px 12px;
+  cursor: pointer;
+  transition: border-color 0.2s ease;
+}
+
+.card:active {
+  border-color: rgba(255, 255, 255, 0.2);
 }
 
 .analogy {
@@ -36,16 +108,39 @@
   -webkit-box-orient: vertical;
 }
 
+.cardExpanded .analogy {
+  -webkit-line-clamp: unset;
+  overflow: visible;
+}
+
 .meta {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   margin-top: 6px;
   font-size: 0.6875rem;
   color: var(--color-text-muted);
 }
 
-.minter,
-.upvotes {
+.minter {
+  opacity: 0.8;
+}
+
+.viewFullGallery {
+  display: block;
+  text-align: center;
+  padding: 10px;
+  color: var(--color-accent);
+  font-size: 0.75rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  width: 100%;
+  transition: opacity 0.2s ease;
+}
+
+.viewFullGallery:hover {
   opacity: 0.8;
 }
 

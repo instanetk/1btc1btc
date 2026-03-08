@@ -9,7 +9,7 @@ export async function POST(
   try {
     const { id } = await params;
     const body = await request.json();
-    const { minterAddress, txHash, tokenId } = body;
+    const { minterAddress, txHash, tokenId, minterFid } = body;
 
     if (!minterAddress || !/^0x[a-fA-F0-9]{40}$/.test(minterAddress)) {
       return NextResponse.json(
@@ -34,6 +34,7 @@ export async function POST(
         minterAddress,
         txHash,
         ...(tokenId != null ? { tokenId: Number(tokenId) } : {}),
+        ...(minterFid != null ? { minterFid: Number(minterFid) } : {}),
       },
       { new: true }
     );

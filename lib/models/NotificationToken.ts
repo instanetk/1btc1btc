@@ -5,6 +5,7 @@ export interface INotificationToken extends Document {
   token: string;
   notificationUrl: string;
   enabled: boolean;
+  lastNotifiedAt: Date | null;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -15,6 +16,7 @@ const NotificationTokenSchema = new Schema<INotificationToken>(
     token: { type: String, required: true },
     notificationUrl: { type: String, required: true },
     enabled: { type: Boolean, default: true },
+    lastNotifiedAt: { type: Date, default: null },
   },
   { timestamps: true }
 );
