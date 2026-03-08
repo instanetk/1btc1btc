@@ -1,5 +1,6 @@
-import { createPublicClient, http, parseAbiItem } from "viem";
+import { createPublicClient, http } from "viem";
 import { base } from "viem/chains";
+import { ONEBTC_ABI } from "@/lib/contract";
 import { connectToDatabase } from "@/lib/mongodb";
 import { Analogy } from "@/lib/models/Analogy";
 import { NotificationToken } from "@/lib/models/NotificationToken";
@@ -22,13 +23,14 @@ export function startUpvoteListener() {
   const client = createPublicClient({
     chain: base,
     transport: http(process.env.BASE_RPC_URL),
+    pollingInterval: 10_000,
   });
 
-  client.watchEvent({
+  client.watchContractEvent({
     address: CONTRACT_ADDRESS,
-    event: parseAbiItem(
-      "event Upvoted(uint256 indexed tokenId, address indexed voter)"
-    ),
+    abi: ONEBTC_ABI,
+    eventName: "Upvoted",
+    pollingInterval: 10_000,
     onLogs: async (logs) => {
       console.log(`[UpvoteListener] Received ${logs.length} event(s)`);
 
