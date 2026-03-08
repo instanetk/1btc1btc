@@ -14,6 +14,7 @@ __metadata:
     "@coinbase/cds-web": ^8.43.0
     "@coinbase/onchainkit": latest
     "@eslint/eslintrc": ^3
+    "@farcaster/miniapp-node": ^0.1.13
     "@farcaster/miniapp-sdk": ^0.2.3
     "@farcaster/miniapp-wagmi-connector": ^1.1.1
     "@next/eslint-plugin-next": 15.3.4
@@ -616,6 +617,18 @@ __metadata:
     ox: ^0.4.4
     zod: ^3.25.0
   checksum: ec08961b949e43abb285b3fafa063a1da1b81e7fd93d0da19b6b7ce337ecb4177192ecb70e55c553c5479dac3447e68b803f34e20be543c929b086dd903ccaed
+  languageName: node
+  linkType: hard
+
+"@farcaster/miniapp-node@npm:^0.1.13":
+  version: 0.1.13
+  resolution: "@farcaster/miniapp-node@npm:0.1.13"
+  dependencies:
+    "@farcaster/miniapp-core": 0.5.1
+    "@noble/curves": ^1.7.0
+    ox: ^0.4.4
+    zod: ^3.24.1
+  checksum: 34c764cb4166938388c972b38407cfc2acb73b5c9af90ea1e5d7cd0487074f86bb1f83726c7671838b5edb3f275e3f84fc8724d6d2c7b2b5b971a5598f6fbdca
   languageName: node
   linkType: hard
 
@@ -1739,7 +1752,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@noble/curves@npm:^1.4.2, @noble/curves@npm:^1.6.0, @noble/curves@npm:^1.9.7, @noble/curves@npm:~1.9.0":
+"@noble/curves@npm:^1.4.2, @noble/curves@npm:^1.6.0, @noble/curves@npm:^1.7.0, @noble/curves@npm:^1.9.7, @noble/curves@npm:~1.9.0":
   version: 1.9.7
   resolution: "@noble/curves@npm:1.9.7"
   dependencies:
@@ -11211,7 +11224,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"zod@npm:^3.23.8, zod@npm:^3.24.4, zod@npm:^3.25.0, zod@npm:^3.25.1":
+"zod@npm:^3.23.8, zod@npm:^3.24.1, zod@npm:^3.24.4, zod@npm:^3.25.0, zod@npm:^3.25.1":
   version: 3.25.76
   resolution: "zod@npm:3.25.76"
   checksum: c9a403a62b329188a5f6bd24d5d935d2bba345f7ab8151d1baa1505b5da9f227fb139354b043711490c798e91f3df75991395e40142e6510a4b16409f302b849

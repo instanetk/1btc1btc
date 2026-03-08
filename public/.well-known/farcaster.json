@@ -18,6 +18,7 @@
     "requiredChains": ["eip155:8453"],
     "ogTitle": "1BTC1BTC",
     "ogDescription": "Generate Bitcoin aphorisms and mint them as onchain SVG NFTs on Base.",
-    "ogImageUrl": "https://1btc1btc.money/frame-og.png"
+    "ogImageUrl": "https://1btc1btc.money/frame-og.png",
+    "webhookUrl": "https://1btc1btc.money/api/webhook"
   }
 }

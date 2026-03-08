@@ -15,6 +15,7 @@
     "@coinbase/cds-icons": "^5.11.0",
     "@coinbase/cds-web": "^8.43.0",
     "@coinbase/onchainkit": "latest",
+    "@farcaster/miniapp-node": "^0.1.13",
     "@farcaster/miniapp-sdk": "^0.2.3",
     "@farcaster/miniapp-wagmi-connector": "^1.1.1",
     "@tanstack/react-query": "^5.81.5",
