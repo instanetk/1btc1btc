@@ -36,6 +36,18 @@
   flex-shrink: 0;
 }
 
+.actions > div {
+  width: 100%;
+}
+
+.actions button {
+  width: 100%;
+}
+
+.actions p {
+  text-align: center;
+}
+
 .termsModal {
   position: fixed;
   inset: 0;
