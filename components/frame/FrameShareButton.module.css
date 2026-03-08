@@ -20,11 +20,12 @@
   padding: 3px 6px;
   border-color: rgba(255, 255, 255, 0.15);
   border-radius: 6px;
+  background: transparent;
   color: #888;
   font-size: 0.6875rem;
+  font-weight: 400;
   animation: none;
-  display: flex;
-  align-items: center;
+  flex-shrink: 0;
 }
 
 .button.compact:hover {
