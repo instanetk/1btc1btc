@@ -3,9 +3,9 @@ import { sendWeeklyTopThought } from "./weeklyTopThought";
 import { sendWeeklyAbsurd } from "./weeklyAbsurd";
 
 export function startNotificationScheduler() {
-  // Weekly Top Thought: Sundays at 9:00 PM Eastern
+  // Weekly Top Thought: Sundays at 9:00 AM Eastern
   cron.schedule(
-    "0 21 * * 0",
+    "0 9 * * 0",
     async () => {
       console.log("[Scheduler] Triggering weekly top thought...");
       await sendWeeklyTopThought();
@@ -13,7 +13,7 @@ export function startNotificationScheduler() {
     { timezone: "America/New_York" }
   );
 
-  console.log("[Scheduler] Weekly Top Thought: Sundays 9:00 PM ET");
+  console.log("[Scheduler] Weekly Top Thought: Sundays 9:00 AM ET");
 
   // Weekly Absurd Conversion: Wednesdays at 12:00 PM Eastern
   cron.schedule(
