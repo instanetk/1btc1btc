@@ -85,10 +85,12 @@ export async function broadcastNotification({
   title,
   body,
   targetUrl,
+  notificationId,
 }: {
   title: string;
   body: string;
   targetUrl: string;
+  notificationId?: string;
 }): Promise<{ sent: number; failed: number }> {
   await connectToDatabase();
 
@@ -107,7 +109,7 @@ export async function broadcastNotification({
 
   let sent = 0;
   let failed = 0;
-  const notificationId = crypto.randomUUID();
+  const resolvedNotificationId = notificationId ?? crypto.randomUUID();
 
   for (const [url, tokenList] of byUrl) {
     // Batch in groups of 100 (Farcaster API limit)
@@ -116,7 +118,7 @@ export async function broadcastNotification({
 
       try {
         const payload: SendNotificationRequest = {
-          notificationId,
+          notificationId: resolvedNotificationId,
           title: title.slice(0, 32),
           body: body.slice(0, 128),
           targetUrl,
