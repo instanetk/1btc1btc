@@ -5,6 +5,7 @@ import { decodeEventLog } from "viem";
 import { contractConfig, ONEBTC_ABI } from "@/lib/contract";
 import { useMintPrice } from "@/hooks/useMintPrice";
 import { trackEvent } from "@/lib/analytics";
+import { Toast } from "./Toast";
 import styles from "./MintButton.module.css";
 
 interface MintButtonProps {
@@ -99,6 +100,7 @@ export function MintButton({ analogy, analogyId, onSuccess, onConnect, onOpenTer
   }, [isSuccess, txHash, onSuccess, analogyId, address, receipt, minterFid]);
 
   const [showToast, setShowToast] = useState(false);
+  const isChainMismatch = writeError?.message.includes("does not match the target chain") ?? false;
   useEffect(() => {
     if (writeError && !writeError.message.includes("User rejected")) {
       trackEvent("Mint Fail");
@@ -137,13 +139,10 @@ export function MintButton({ analogy, analogyId, onSuccess, onConnect, onOpenTer
         <p className={styles.error}>Transaction cancelled.</p>
       )}
       {showToast && (
-        <div className={styles.toast}>
-          <svg className={styles.baseLogo} viewBox="0 0 111 111" xmlns="http://www.w3.org/2000/svg">
-            <rect width="111" height="111" rx="5.55" fill="#0000FF"/>
-          </svg>
-          <span className={styles.toastText}>Ensure your wallet is on the Base network.</span>
-          <button className={styles.toastClose} onClick={() => setShowToast(false)}>✕</button>
-        </div>
+        <Toast
+          message={isChainMismatch ? "Please switch your wallet to Base network." : "Something went wrong. Ensure your wallet is on the Base network."}
+          onClose={() => setShowToast(false)}
+        />
       )}
     </div>
   );

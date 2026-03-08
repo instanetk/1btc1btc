@@ -1,8 +1,9 @@
 "use client";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useAccount } from "wagmi";
 import { useUpvote } from "@/hooks/useUpvote";
 import { trackEvent } from "@/lib/analytics";
+import { Toast } from "./Toast";
 import styles from "./UpvoteButton.module.css";
 
 interface UpvoteButtonProps {
@@ -14,7 +15,8 @@ interface UpvoteButtonProps {
 
 export function UpvoteButton({ tokenId, currentUpvotes, onSuccess, onConnect }: UpvoteButtonProps) {
   const { address, isConnected } = useAccount();
-  const { upvote, hasVoted, isPending, isSuccess } = useUpvote(tokenId, address);
+  const { upvote, hasVoted, isPending, isSuccess, error } = useUpvote(tokenId, address);
+  const [showToast, setShowToast] = useState(false);
 
   const notifiedRef = useRef(false);
   useEffect(() => {
@@ -23,6 +25,15 @@ export function UpvoteButton({ tokenId, currentUpvotes, onSuccess, onConnect }: 
       onSuccess();
     }
   }, [isSuccess, onSuccess]);
+
+  const isChainMismatch = error?.message.includes("does not match the target chain") ?? false;
+  useEffect(() => {
+    if (error && !error.message.includes("User rejected")) {
+      setShowToast(true);
+      const t = setTimeout(() => setShowToast(false), 6000);
+      return () => clearTimeout(t);
+    }
+  }, [error]);
 
   const voted = hasVoted === true;
 
@@ -36,6 +47,7 @@ export function UpvoteButton({ tokenId, currentUpvotes, onSuccess, onConnect }: 
   };
 
   return (
+    <>
     <button
       className={`${styles.button} ${voted ? styles.voted : ""}`}
       onClick={handleClick}
@@ -59,5 +71,12 @@ export function UpvoteButton({ tokenId, currentUpvotes, onSuccess, onConnect }: 
         {isPending ? currentUpvotes + 1 : currentUpvotes}
       </span>
     </button>
+    {showToast && (
+      <Toast
+        message={isChainMismatch ? "Please switch your wallet to Base network." : "Something went wrong. Please try again."}
+        onClose={() => setShowToast(false)}
+      />
+    )}
+    </>
   );
 }
