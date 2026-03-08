@@ -13,6 +13,7 @@ import styles from "./NftModal.module.css";
 interface NftModalProps {
   item: GalleryItem;
   onUpvoteSuccess?: () => void;
+  onConnect?: () => void;
   onClose: () => void;
 }
 
@@ -24,7 +25,7 @@ function getOpenSeaUrl(tokenId: bigint): string {
   return `${base}/${CONTRACT_ADDRESS}/${tokenId.toString()}`;
 }
 
-export function NftModal({ item, onUpvoteSuccess, onClose }: NftModalProps) {
+export function NftModal({ item, onUpvoteSuccess, onConnect, onClose }: NftModalProps) {
   const { data, isLoading } = useReadContract({
     ...contractConfig,
     functionName: "tokenURI",
@@ -82,6 +83,7 @@ export function NftModal({ item, onUpvoteSuccess, onClose }: NftModalProps) {
               tokenId={item.tokenId}
               currentUpvotes={item.upvotes}
               onSuccess={onUpvoteSuccess}
+              onConnect={onConnect}
             />
             <a
               className={styles.buyButton}

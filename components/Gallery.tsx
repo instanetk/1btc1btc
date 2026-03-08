@@ -5,7 +5,7 @@ import { GalleryCard } from "./GalleryCard";
 import { GallerySortToggle } from "./GallerySortToggle";
 import styles from "./Gallery.module.css";
 
-export function Gallery({ refreshKey }: { refreshKey?: number }) {
+export function Gallery({ refreshKey, onConnect }: { refreshKey?: number; onConnect?: () => void }) {
   const { items, isLoading, error, refetch, sort, setSort, page, setPage, totalPages } = useGallery(refreshKey);
 
   return (
@@ -38,6 +38,7 @@ export function Gallery({ refreshKey }: { refreshKey?: number }) {
                 key={item.tokenId.toString()}
                 item={item}
                 onUpvoteSuccess={refetch}
+                onConnect={onConnect}
               />
             ))}
           </div>

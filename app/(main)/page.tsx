@@ -152,7 +152,7 @@ export default function Home() {
       <div className={styles.divider} />
 
       {/* Gallery section */}
-      <Gallery refreshKey={galleryRefreshKey} />
+      <Gallery refreshKey={galleryRefreshKey} onConnect={openWalletModal} />
 
       {/* Divider */}
       <div className={styles.divider} />

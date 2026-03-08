@@ -11,9 +11,10 @@ import styles from "./GalleryCard.module.css";
 interface GalleryCardProps {
   item: GalleryItem;
   onUpvoteSuccess?: () => void;
+  onConnect?: () => void;
 }
 
-export function GalleryCard({ item, onUpvoteSuccess }: GalleryCardProps) {
+export function GalleryCard({ item, onUpvoteSuccess, onConnect }: GalleryCardProps) {
   const [showNft, setShowNft] = useState(false);
 
   return (
@@ -37,12 +38,13 @@ export function GalleryCard({ item, onUpvoteSuccess }: GalleryCardProps) {
               tokenId={item.tokenId}
               currentUpvotes={item.upvotes}
               onSuccess={onUpvoteSuccess}
+              onConnect={onConnect}
             />
           </div>
         </div>
       </div>
       {showNft && (
-        <NftModal item={item} onUpvoteSuccess={onUpvoteSuccess} onClose={() => setShowNft(false)} />
+        <NftModal item={item} onUpvoteSuccess={onUpvoteSuccess} onConnect={onConnect} onClose={() => setShowNft(false)} />
       )}
     </>
   );

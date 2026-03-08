@@ -9,9 +9,10 @@ interface UpvoteButtonProps {
   tokenId: bigint;
   currentUpvotes: number;
   onSuccess?: () => void;
+  onConnect?: () => void;
 }
 
-export function UpvoteButton({ tokenId, currentUpvotes, onSuccess }: UpvoteButtonProps) {
+export function UpvoteButton({ tokenId, currentUpvotes, onSuccess, onConnect }: UpvoteButtonProps) {
   const { address, isConnected } = useAccount();
   const { upvote, hasVoted, isPending, isSuccess } = useUpvote(tokenId, address);
 
@@ -25,11 +26,20 @@ export function UpvoteButton({ tokenId, currentUpvotes, onSuccess }: UpvoteButto
 
   const voted = hasVoted === true;
 
+  const handleClick = () => {
+    if (!isConnected) {
+      onConnect?.();
+      return;
+    }
+    trackEvent("Upvote", { tokenId: Number(tokenId) });
+    upvote();
+  };
+
   return (
     <button
       className={`${styles.button} ${voted ? styles.voted : ""}`}
-      onClick={() => { trackEvent("Upvote", { tokenId: Number(tokenId) }); upvote(); }}
-      disabled={!isConnected || voted || isPending}
+      onClick={handleClick}
+      disabled={voted || isPending}
       title={!isConnected ? "Connect wallet to upvote" : voted ? "Already voted" : "Upvote"}
     >
       <svg
