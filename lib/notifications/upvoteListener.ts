@@ -10,23 +10,61 @@ const CONTRACT_ADDRESS = process.env
   .NEXT_PUBLIC_CONTRACT_ADDRESS as `0x${string}`;
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://1btc1btc.money";
 const NOTIFICATION_COOLDOWN_MS = 60 * 60 * 1000; // 1 hour
-const POLL_INTERVAL_MS = 10_000;
-const RESTART_DELAY_MS = 5_000;
+const POLL_INTERVAL_MS = 60_000;
 const MILESTONES = [10, 25, 50, 100, 250, 500, 1000];
 
-function createWatcher() {
-  const client = createPublicClient({
-    chain: base,
-    transport: http(process.env.BASE_RPC_URL),
-    pollingInterval: POLL_INTERVAL_MS,
-  });
+// Exponential backoff: 5s → 10s → 20s → 40s → 60s (cap)
+const INITIAL_RESTART_DELAY_MS = 5_000;
+const MAX_RESTART_DELAY_MS = 60_000;
 
-  const unwatch = client.watchContractEvent({
+// Singleton client — reused across watcher restarts
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let client: any = null;
+let currentUnwatch: (() => void) | null = null;
+let restartDelay = INITIAL_RESTART_DELAY_MS;
+let restartTimer: ReturnType<typeof setTimeout> | null = null;
+
+function getClient() {
+  if (!client) {
+    client = createPublicClient({
+      chain: base,
+      transport: http(process.env.BASE_RPC_URL),
+      pollingInterval: POLL_INTERVAL_MS,
+    });
+  }
+  return client as ReturnType<typeof createPublicClient>;
+}
+
+function cleanup() {
+  if (currentUnwatch) {
+    try {
+      currentUnwatch();
+    } catch {
+      // ignore cleanup errors
+    }
+    currentUnwatch = null;
+  }
+  if (restartTimer) {
+    clearTimeout(restartTimer);
+    restartTimer = null;
+  }
+}
+
+function createWatcher() {
+  // Always clean up previous watcher before creating a new one
+  cleanup();
+
+  const publicClient = getClient();
+
+  currentUnwatch = publicClient.watchContractEvent({
     address: CONTRACT_ADDRESS,
     abi: ONEBTC_ABI,
     eventName: "Upvoted",
     pollingInterval: POLL_INTERVAL_MS,
     onLogs: async (logs) => {
+      // Reset backoff on successful event receipt
+      restartDelay = INITIAL_RESTART_DELAY_MS;
+
       console.log(`[UpvoteListener] Received ${logs.length} event(s)`);
 
       for (const log of logs) {
@@ -98,7 +136,7 @@ function createWatcher() {
           }
 
           // --- Milestone notification (bypasses rate limit) ---
-          const currentVotes = await client.readContract({
+          const currentVotes = await publicClient.readContract({
             address: CONTRACT_ADDRESS,
             abi: ONEBTC_ABI,
             functionName: "upvotes",
@@ -127,11 +165,15 @@ function createWatcher() {
     onError: (error) => {
       const msg = error instanceof Error ? error.message : String(error);
 
-      // Filter expired or not supported — restart the watcher
+      // Filter expired or not supported — restart the watcher with backoff
       if (msg.includes("filter not found") || msg.includes("eth_getFilterChanges")) {
-        console.warn("[UpvoteListener] Filter expired, restarting in", RESTART_DELAY_MS / 1000, "s...");
-        unwatch();
-        setTimeout(createWatcher, RESTART_DELAY_MS);
+        console.warn(
+          `[UpvoteListener] Filter expired, restarting in ${restartDelay / 1000}s...`
+        );
+        cleanup();
+        restartTimer = setTimeout(createWatcher, restartDelay);
+        // Exponential backoff with cap
+        restartDelay = Math.min(restartDelay * 2, MAX_RESTART_DELAY_MS);
       } else {
         console.error("[UpvoteListener] watchEvent error:", error);
       }
