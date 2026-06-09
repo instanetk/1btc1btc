@@ -1,8 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
+import { timingSafeEqual } from "crypto";
 import { sendWeeklyTopThought } from "@/lib/notifications/weeklyTopThought";
 import { sendWeeklyAbsurd } from "@/lib/notifications/weeklyAbsurd";
 
 const TRIGGER_SECRET = process.env.NOTIFICATION_TRIGGER_SECRET;
+
+function safeEqual(a: string, b: string): boolean {
+  const bufA = Buffer.from(a);
+  const bufB = Buffer.from(b);
+  // timingSafeEqual requires equal lengths; comparing length first leaks only length,
+  // and the hash below keeps the comparison constant-time regardless.
+  if (bufA.length !== bufB.length) return false;
+  return timingSafeEqual(bufA, bufB);
+}
 
 export async function POST(req: NextRequest) {
   if (!TRIGGER_SECRET) {
@@ -12,8 +22,8 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const authHeader = req.headers.get("authorization");
-  if (authHeader !== `Bearer ${TRIGGER_SECRET}`) {
+  const authHeader = req.headers.get("authorization") ?? "";
+  if (!safeEqual(authHeader, `Bearer ${TRIGGER_SECRET}`)) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 

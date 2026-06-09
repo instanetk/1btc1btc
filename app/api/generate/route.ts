@@ -3,43 +3,38 @@ import Anthropic from "@anthropic-ai/sdk";
 import { ANALOGY_SYSTEM_PROMPT, getAnalogyUserPrompt } from "@/lib/prompts";
 import { connectToDatabase } from "@/lib/mongodb";
 import { Analogy } from "@/lib/models/Analogy";
+import { checkRateLimit, getClientIp } from "@/lib/server/rateLimit";
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
 });
 
-// Simple in-memory rate limiting: 1 request per IP per 3 seconds
-const rateLimitMap = new Map<string, number>();
-const RATE_LIMIT_MS = 3000;
-
-function isRateLimited(ip: string): boolean {
-  const now = Date.now();
-  const lastRequest = rateLimitMap.get(ip);
-  if (lastRequest && now - lastRequest < RATE_LIMIT_MS) {
-    return true;
-  }
-  rateLimitMap.set(ip, now);
-  // Clean old entries periodically
-  if (rateLimitMap.size > 10000) {
-    const cutoff = now - RATE_LIMIT_MS * 2;
-    for (const [key, timestamp] of rateLimitMap) {
-      if (timestamp < cutoff) rateLimitMap.delete(key);
-    }
-  }
-  return false;
-}
+// Per-IP limit: 1 request per 3 seconds.
+const PER_IP_LIMIT = 1;
+const PER_IP_WINDOW_MS = 3000;
+// Global backstop: hard ceiling on paid Claude calls per minute across all callers,
+// so IP rotation / header spoofing can't drive unbounded API spend.
+const GLOBAL_LIMIT = 30;
+const GLOBAL_WINDOW_MS = 60_000;
 
 export async function POST(request: Request) {
-  const ip =
-    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ??
-    request.headers.get("x-real-ip") ??
-    "unknown";
+  const ip = getClientIp(request);
 
-  if (isRateLimited(ip)) {
-    return NextResponse.json(
-      { error: "Please wait a moment before generating again." },
-      { status: 429 }
-    );
+  // Both limits are backed by MongoDB so they hold across serverless instances.
+  // Fail open on limiter errors so a DB blip doesn't take generation down.
+  try {
+    const [ipOk, globalOk] = await Promise.all([
+      checkRateLimit(`generate:ip:${ip}`, PER_IP_LIMIT, PER_IP_WINDOW_MS),
+      checkRateLimit("generate:global", GLOBAL_LIMIT, GLOBAL_WINDOW_MS),
+    ]);
+    if (!ipOk || !globalOk) {
+      return NextResponse.json(
+        { error: "Please wait a moment before generating again." },
+        { status: 429 }
+      );
+    }
+  } catch (rlError) {
+    console.error("Rate limit check failed (allowing request):", rlError);
   }
 
   if (!process.env.ANTHROPIC_API_KEY) {
