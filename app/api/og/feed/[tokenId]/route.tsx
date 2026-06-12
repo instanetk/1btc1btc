@@ -1,11 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createPublicClient, http, keccak256, encodePacked } from "viem";
-import { base } from "viem/chains";
-import sharp from "sharp";
+import { keccak256, encodePacked } from "viem";
+import { sharp } from "@/lib/server/sharp";
 import { connectToDatabase } from "@/lib/mongodb";
 import { Analogy } from "@/lib/models/Analogy";
 import { ONEBTC_ABI } from "@/lib/contract";
-import { CONTRACT_ADDRESS } from "@/lib/constants";
+import { getChainClient, CONTRACT_ADDRESS } from "@/lib/server/chainClient";
 
 // Layout constants for 1200x630 OG image
 const W = 1200;
@@ -166,13 +165,7 @@ async function renderFromMongo(id: number): Promise<Buffer> {
 }
 
 async function renderFromContract(id: number): Promise<Buffer> {
-  const rpcUrl = process.env.BASE_RPC_URL || "https://mainnet.base.org";
-  const client = createPublicClient({
-    chain: base,
-    transport: http(rpcUrl),
-  });
-
-  const uri = (await client.readContract({
+  const uri = (await getChainClient().readContract({
     address: CONTRACT_ADDRESS as `0x${string}`,
     abi: ONEBTC_ABI,
     functionName: "tokenURI",

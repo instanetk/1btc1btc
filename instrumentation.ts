@@ -6,7 +6,9 @@ export async function register() {
     const { startNotificationScheduler } = await import(
       "./lib/notifications/scheduler"
     );
+    const { startMemoryLogger } = await import("./lib/server/memoryLogger");
 
+    startMemoryLogger();
     startUpvoteListener();
     startNotificationScheduler();
   }
