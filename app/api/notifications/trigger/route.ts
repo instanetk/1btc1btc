@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { bearerAuthorized } from "@/lib/server/auth";
 import { sendWeeklyTopThought } from "@/lib/notifications/weeklyTopThought";
 import { sendWeeklyAbsurd } from "@/lib/notifications/weeklyAbsurd";
 
@@ -12,8 +13,7 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const authHeader = req.headers.get("authorization");
-  if (authHeader !== `Bearer ${TRIGGER_SECRET}`) {
+  if (!bearerAuthorized(req.headers.get("authorization"), TRIGGER_SECRET)) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 

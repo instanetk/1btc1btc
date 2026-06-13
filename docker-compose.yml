@@ -7,3 +7,12 @@ services:
     env_file:
       - .env
     restart: unless-stopped
+    # Hard memory ceiling: if memory is exhausted, the kernel kills only this
+    # container (and `restart` brings it back) instead of OOM-killing the droplet.
+    # 4 GB droplet → leave headroom for the OS / reverse proxy.
+    mem_limit: 2g
+    mem_reservation: 1g
+    environment:
+      # Cap the V8 heap; native (sharp) memory lives outside this, bounded by mem_limit.
+      - NODE_OPTIONS=--max-old-space-size=1024
+      - MALLOC_ARENA_MAX=2

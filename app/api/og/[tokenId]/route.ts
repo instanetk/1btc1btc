@@ -1,14 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createPublicClient, http } from "viem";
-import { base } from "viem/chains";
-import sharp from "sharp";
+import { sharp } from "@/lib/server/sharp";
 import { ONEBTC_ABI } from "@/lib/contract";
-import { CONTRACT_ADDRESS } from "@/lib/constants";
-
-const client = createPublicClient({
-  chain: base,
-  transport: http(process.env.BASE_RPC_URL || "https://mainnet.base.org"),
-});
+import { getChainClient, CONTRACT_ADDRESS } from "@/lib/server/chainClient";
 
 export async function GET(
   _req: NextRequest,
@@ -18,7 +11,7 @@ export async function GET(
     const { tokenId } = await params;
     const id = BigInt(tokenId);
 
-    const uri = (await client.readContract({
+    const uri = (await getChainClient().readContract({
       address: CONTRACT_ADDRESS as `0x${string}`,
       abi: ONEBTC_ABI,
       functionName: "tokenURI",

@@ -329,6 +329,77 @@ contract OnebtcOnebtcTest is Test {
         }
     }
 
+    function test_tokenURI_multibyteUtf8NotSplit() public {
+        uint256 price = nft.getMintPriceInEth();
+
+        // 44 ASCII chars (no spaces) followed by a 3-byte UTF-8 char ("…" = E2 80 A6).
+        // The 45-char hard-break boundary lands inside the multibyte sequence — the old
+        // byte-based wrap split it and produced invalid UTF-8 in the SVG.
+        bytes memory text = new bytes(47);
+        for (uint256 i = 0; i < 44; i++) text[i] = "a";
+        text[44] = 0xE2;
+        text[45] = 0x80;
+        text[46] = 0xA6;
+
+        vm.prank(minter);
+        nft.mint{value: price}(string(text));
+
+        // Decode JSON, extract the embedded SVG, and assert it is valid UTF-8.
+        bytes memory svg = _extractSvg(nft.tokenURI(0));
+        _assertValidUtf8(svg);
+    }
+
+    /// @dev Decodes the data URI returned by tokenURI and returns the raw SVG bytes.
+    function _extractSvg(string memory uri) internal pure returns (bytes memory) {
+        bytes memory u = bytes(uri);
+        bytes memory jsonPrefix = bytes("data:application/json;base64,");
+        bytes memory jsonB64 = new bytes(u.length - jsonPrefix.length);
+        for (uint256 i = 0; i < jsonB64.length; i++) {
+            jsonB64[i] = u[jsonPrefix.length + i];
+        }
+        bytes memory json = Base64.decode(string(jsonB64));
+
+        // Locate the SVG base64 payload: ...;base64,<payload>"}
+        bytes memory marker = bytes(";base64,");
+        uint256 start = _indexOf(json, marker) + marker.length;
+        uint256 end = start;
+        while (end < json.length && json[end] != '"') end++;
+
+        bytes memory svgB64 = new bytes(end - start);
+        for (uint256 i = 0; i < svgB64.length; i++) svgB64[i] = json[start + i];
+        return Base64.decode(string(svgB64));
+    }
+
+    function _indexOf(bytes memory haystack, bytes memory needle) internal pure returns (uint256) {
+        for (uint256 i = 0; i + needle.length <= haystack.length; i++) {
+            bool ok = true;
+            for (uint256 j = 0; j < needle.length; j++) {
+                if (haystack[i + j] != needle[j]) { ok = false; break; }
+            }
+            if (ok) return i;
+        }
+        revert("needle not found");
+    }
+
+    /// @dev Reverts unless `s` is well-formed UTF-8 (catches split multibyte sequences).
+    function _assertValidUtf8(bytes memory s) internal pure {
+        uint256 i = 0;
+        while (i < s.length) {
+            uint8 c = uint8(s[i]);
+            uint256 n;
+            if (c < 0x80) n = 0;
+            else if (c >> 5 == 0x6) n = 1; // 110xxxxx
+            else if (c >> 4 == 0xE) n = 2; // 1110xxxx
+            else if (c >> 3 == 0x1E) n = 3; // 11110xxx
+            else revert("orphaned/invalid leading byte");
+            for (uint256 k = 1; k <= n; k++) {
+                require(i + k < s.length, "truncated multibyte sequence");
+                require(uint8(s[i + k]) >> 6 == 0x2, "bad continuation byte");
+            }
+            i += n + 1;
+        }
+    }
+
     function test_constructor_rejectsZeroBtcFeed() public {
         vm.expectRevert("Invalid BTC feed");
         new OnebtcOnebtc(address(0), address(ethFeed), owner);

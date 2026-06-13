@@ -1,6 +1,8 @@
 # 1BTC1BTC.money — Terms of Service
 
-*Last updated: February 28, 2026*
+*Last updated: June 13, 2026*
+
+1BTC1BTC.money is operated by **Wavefunction Labs, LLC** ("Company," "we," "us," or "our").
 
 By accessing 1BTC1BTC.money (the "Site") or interacting with the OnebtcOnebtc smart contract on Base (the "Contract"), you agree to these Terms of Service ("Terms"). If you do not agree, do not use the Site or mint any tokens.
 
@@ -39,9 +41,9 @@ The Contract includes an on-chain upvoting mechanism limited to one vote per wal
 
 ## 6. Secondary Sales and Royalties
 
-The Contract implements ERC-2981, specifying a 10% royalty on secondary sales payable to the contract owner. Whether this royalty is honored depends on the marketplace where a secondary sale occurs — many marketplaces have reduced or eliminated creator royalty enforcement.
+The Contract implements ERC-2981, specifying a 10% royalty on secondary sales payable to a royalty-recipient address designated by the Company at the time the Contract is deployed. Whether this royalty is honored depends on the marketplace where a secondary sale occurs — many marketplaces have reduced or eliminated creator royalty enforcement.
 
-You are free to sell or transfer your token on any compatible marketplace or directly via the blockchain. The project makes no representations about the resale value of any token. Most NFTs have no secondary market value.
+You are free to sell or transfer your token on any compatible marketplace or directly via the blockchain. The Company makes no representations about the resale value of any token. Most NFTs have no secondary market value.
 
 ## 7. Risks You Accept
 
@@ -73,7 +75,7 @@ You agree not to:
 The Site collects minimal data:
 
 - **Wallet addresses** are inherently public on the blockchain. The Site reads on-chain data (minted tokens, upvotes) to populate the gallery.
-- **IP addresses** are used transiently for rate limiting (1 request per IP per 3 seconds on the generation endpoint) and are not stored long-term.
+- **IP addresses** are used for rate limiting on the generation endpoint (a short-lived, automatically expiring counter) and are not retained long-term or linked to your identity.
 - **Unminted analogies** are stored in a database (MongoDB) and associated with a session, not with a wallet address or personally identifiable information.
 - **Analytics**, if enabled, are collected via self-hosted Matomo Analytics, which does not use cookies or collect personal data.
 
@@ -81,11 +83,11 @@ No personal data is sold to or shared with third parties.
 
 ## 10. Taxes
 
-You are solely responsible for determining and fulfilling any tax obligations arising from your purchase, ownership, sale, or transfer of tokens. This may include income tax, capital gains tax, sales tax, VAT, or other taxes depending on your jurisdiction. The project does not provide tax reporting, withholding, or documentation such as 1099 forms.
+You are solely responsible for determining and fulfilling any tax obligations arising from your purchase, ownership, sale, or transfer of tokens. This may include income tax, capital gains tax, sales tax, VAT, or other taxes depending on your jurisdiction. The Company does not provide tax reporting, withholding, or documentation such as 1099 forms.
 
 ## 11. Limitation of Liability
 
-To the maximum extent permitted by applicable law, the project, its creator(s), and contributors shall not be liable for any indirect, incidental, special, consequential, or punitive damages, or any loss of profits, tokens, data, or digital assets, whether in contract, tort, or otherwise, arising from your use of the Site or Contract.
+To the maximum extent permitted by applicable law, the Company and its members, managers, officers, employees, and contributors shall not be liable for any indirect, incidental, special, consequential, or punitive damages, or any loss of profits, tokens, data, or digital assets, whether in contract, tort, or otherwise, arising from your use of the Site or Contract.
 
 Total aggregate liability, if any, shall not exceed the amount of ETH you paid to mint the specific token(s) at issue.
 
@@ -101,10 +103,14 @@ These Terms may be updated at any time. Material changes will be indicated by up
 
 These Terms are governed by the laws of the State of Florida, United States, without regard to conflict of law principles. Any disputes shall be resolved in the state or federal courts located in Florida.
 
-## 15. Severability
+## 15. Assignment
+
+You may not assign or transfer your rights or obligations under these Terms without the Company's prior written consent, except that ownership of a token may be transferred on-chain as described in these Terms. The Company may freely assign or transfer its rights and obligations under these Terms — including in connection with a sale, merger, reorganization, or transfer of the project, the Site, or the Contract — without your consent and without notice. These Terms bind and benefit the parties and their permitted successors and assigns.
+
+## 16. Severability
 
 If any provision of these Terms is found to be unenforceable, the remaining provisions shall continue in full force and effect.
 
-## 16. Contact
+## 17. Contact
 
-For questions about these Terms or the project, open an issue on the [GitHub repository](https://github.com/instanetk/1btc1btc).
+These Terms and the project are operated by Wavefunction Labs, LLC. For questions about these Terms or the project, contact us at <CONTACT_EMAIL> or open an issue on the [GitHub repository](https://github.com/instanetk/1btc1btc).

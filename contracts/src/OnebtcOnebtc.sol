@@ -137,7 +137,6 @@ contract OnebtcOnebtc is ERC721, ERC2981, Ownable2Step, Pausable, ReentrancyGuar
         require(tokenId < totalSupply, "Token does not exist");
 
         string memory rawAnalogy = analogies[tokenId];
-        string memory analogySvg = _escapeXml(rawAnalogy);
         string memory analogyJson = _escapeJson(rawAnalogy);
         string memory tokenIdStr = tokenId.toString();
 
@@ -149,7 +148,7 @@ contract OnebtcOnebtc is ERC721, ERC2981, Ownable2Step, Pausable, ReentrancyGuar
             '<path fill="#F7931A" fill-rule="evenodd" d="M697.95,580.63C684.16,580.61 670.85,580.61 657.21,580.61C657.21,572.3 657.21,564.44 657.21,556.47C663.84,556.1 670.25,555.74 677.19,555.34C677.19,517.22 677.19,479.63 677.19,441.17C670.86,441.17 664.17,441.17 657.25,441.17C657.25,432.55 657.25,424.77 657.25,416.25C671.78,416.25 686.32,416.25 701.44,416.25C701.44,406.32 701.44,397.1 701.44,387.55C708.58,387.55 715.15,387.55 722.41,387.55C722.41,396.48 722.41,405.4 722.41,414.72C726.79,414.72 730.51,414.72 734.89,414.72C734.89,405.91 734.89,396.99 734.89,387.58C742.22,387.58 748.95,387.58 756.48,387.58C756.48,396.91 756.48,406.45 756.48,415.92C776.78,419.59 793.41,427.43 797.85,448.87C802.05,469.08 794.87,484.88 774.94,494.84C800.85,502.04 812.16,518.34 807.6,544.21C803.88,565.32 788.85,575.91 756.96,580.66C756.96,589.58 756.96,598.63 756.96,608C749.29,608 742.37,608 734.82,608C734.82,599 734.82,590.1 734.82,580.94C730.61,580.94 727.01,580.94 722.76,580.94C722.76,589.88 722.76,598.78 722.76,608.04C715.23,608.04 708.33,608.04 700.29,608.04C700.29,600.29 700.39,592.67 700.21,585.06C700.17,583.58 699.06,582.13 697.95,580.63M717.72,554.8C730.01,554.24 742.36,554.29 754.56,552.91C764.85,551.75 771.4,543.55 771.72,533.82C772.06,523.13 766.74,515.29 755.51,513.95C741.09,512.24 726.45,512.44 711.23,511.79C711.23,525.12 711.44,537.24 711.12,549.35C710.99,553.89 712.5,555.46 717.72,554.8M748.88,444.45C740.82,443.73 732.76,442.62 724.68,442.38C711.32,441.98 711.31,442.21 711.29,455.75C711.27,465.35 711.29,474.94 711.29,485.94C723.63,484.97 735.6,484.88 747.24,482.88C757.77,481.07 762.72,474.48 763.34,465.29C764.03,455.08 760.16,449.28 748.88,444.45z"/>'
             '</svg>';
 
-        string memory analogyText = _buildAnalogyText(analogySvg);
+        string memory analogyText = _buildAnalogyText(rawAnalogy);
 
         // Build SVG in parts to stay within stack limits
         string memory svgStart = string(
@@ -252,9 +251,47 @@ contract OnebtcOnebtc is ERC721, ERC2981, Ownable2Step, Pausable, ReentrancyGuar
         );
     }
 
-    /// @dev Builds word-wrapped SVG <text> element with <tspan> children from escaped analogy text
-    function _buildAnalogyText(string memory escaped) private pure returns (string memory) {
-        bytes memory b = bytes(escaped);
+    /// @dev Determines where the next wrapped line ends, given the raw (unescaped) bytes.
+    ///      Returns the exclusive end index of the current line and the start index of the
+    ///      next line. Breaks on the last space within the window; otherwise hard-breaks at
+    ///      the window edge, backing up to a UTF-8 codepoint boundary so a multi-byte
+    ///      character is never split (which would corrupt the SVG/UTF-8 output).
+    function _nextLineBreak(bytes memory b, uint256 i, uint256 maxChars)
+        private
+        pure
+        returns (uint256 lineEnd, uint256 nextI)
+    {
+        uint256 remaining = b.length - i;
+        if (remaining <= maxChars) {
+            return (b.length, b.length);
+        }
+
+        uint256 breakAt = 0;
+        bool foundSpace = false;
+        for (uint256 j = i; j < i + maxChars; j++) {
+            if (b[j] == 0x20) {
+                breakAt = j;
+                foundSpace = true;
+            }
+        }
+        if (foundSpace) {
+            return (breakAt, breakAt + 1); // line excludes the space; next line skips it
+        }
+
+        // Hard break: back up off any UTF-8 continuation byte (0b10xxxxxx) so the line
+        // ends on a full codepoint.
+        uint256 end = i + maxChars;
+        while (end > i + 1 && (uint8(b[end]) & 0xC0) == 0x80) {
+            end--;
+        }
+        return (end, end);
+    }
+
+    /// @dev Builds word-wrapped SVG <text> element with <tspan> children from the raw analogy.
+    ///      Wrapping happens on the raw bytes (so escape sequences are never split); each
+    ///      finished line is XML-escaped before being embedded.
+    function _buildAnalogyText(string memory raw) private pure returns (string memory) {
+        bytes memory b = bytes(raw);
         uint256 maxChars = 45;
 
         // Pass 1: Count lines
@@ -262,25 +299,9 @@ contract OnebtcOnebtc is ERC721, ERC2981, Ownable2Step, Pausable, ReentrancyGuar
         {
             uint256 i = 0;
             while (i < b.length) {
-                uint256 remaining = b.length - i;
-                if (remaining <= maxChars) {
-                    lineCount++;
-                    break;
-                }
-                uint256 breakAt = 0;
-                bool foundSpace = false;
-                for (uint256 j = i; j < i + maxChars; j++) {
-                    if (b[j] == 0x20) {
-                        breakAt = j;
-                        foundSpace = true;
-                    }
-                }
+                (, uint256 nextI) = _nextLineBreak(b, i, maxChars);
                 lineCount++;
-                if (foundSpace) {
-                    i = breakAt + 1;
-                } else {
-                    i += maxChars;
-                }
+                i = nextI;
             }
         }
 
@@ -302,35 +323,14 @@ contract OnebtcOnebtc is ERC721, ERC2981, Ownable2Step, Pausable, ReentrancyGuar
             uint256 i = 0;
             bool firstLine = true;
             while (i < b.length) {
-                uint256 lineStart = i;
-                uint256 lineEnd;
-                uint256 remaining = b.length - i;
-                if (remaining <= maxChars) {
-                    lineEnd = b.length;
-                    i = b.length;
-                } else {
-                    uint256 breakAt = 0;
-                    bool foundSpace = false;
-                    for (uint256 j = i; j < i + maxChars; j++) {
-                        if (b[j] == 0x20) {
-                            breakAt = j;
-                            foundSpace = true;
-                        }
-                    }
-                    if (foundSpace) {
-                        lineEnd = breakAt;
-                        i = breakAt + 1;
-                    } else {
-                        lineEnd = i + maxChars;
-                        i += maxChars;
-                    }
-                }
+                (uint256 lineEnd, uint256 nextI) = _nextLineBreak(b, i, maxChars);
 
-                // Extract line substring
-                bytes memory lineBytes = new bytes(lineEnd - lineStart);
-                for (uint256 k = 0; k < lineEnd - lineStart; k++) {
-                    lineBytes[k] = b[lineStart + k];
+                // Extract line substring, then escape it for safe embedding.
+                bytes memory lineBytes = new bytes(lineEnd - i);
+                for (uint256 k = 0; k < lineEnd - i; k++) {
+                    lineBytes[k] = b[i + k];
                 }
+                string memory line = _escapeXml(string(lineBytes));
 
                 if (firstLine) {
                     result = string(abi.encodePacked(
@@ -338,7 +338,7 @@ contract OnebtcOnebtc is ERC721, ERC2981, Ownable2Step, Pausable, ReentrancyGuar
                         '<tspan x="400" y="',
                         startY.toString(),
                         '">',
-                        string(lineBytes),
+                        line,
                         "</tspan>"
                     ));
                     firstLine = false;
@@ -346,10 +346,12 @@ contract OnebtcOnebtc is ERC721, ERC2981, Ownable2Step, Pausable, ReentrancyGuar
                     result = string(abi.encodePacked(
                         result,
                         '<tspan x="400" dy="35">',
-                        string(lineBytes),
+                        line,
                         "</tspan>"
                     ));
                 }
+
+                i = nextI;
             }
         }
 
